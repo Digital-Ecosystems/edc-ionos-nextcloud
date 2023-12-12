@@ -30,7 +30,7 @@ public class NextcloudExtensionCore implements ServiceExtension {
     @Override
     public void initialize(ServiceExtensionContext context) {
         NextCloudApi nextApi = new NextCloudApi();
-        monitor.info("initiate core");
+        monitor.info("initiate "+this.NAME+" core");
 
        // context.registerService(NextcloudExtensionCore.class, nextApi);
     }

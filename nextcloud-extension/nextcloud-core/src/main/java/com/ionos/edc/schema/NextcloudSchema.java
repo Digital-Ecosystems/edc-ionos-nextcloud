@@ -1,6 +1,6 @@
 package com.ionos.edc.schema;
 
-public class NextcloudSchema {
+public interface  NextcloudSchema {
     String TYPE = "Nextcloud";
     String OBJECT_NAME = "objectName";
 
