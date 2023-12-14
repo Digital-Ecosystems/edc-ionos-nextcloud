@@ -4,6 +4,7 @@ import com.ionos.edc.nextcloudapi.NextCloudApi;
 import org.eclipse.edc.connector.dataplane.spi.pipeline.DataSource;
 import org.eclipse.edc.connector.dataplane.spi.pipeline.StreamResult;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
@@ -13,11 +14,13 @@ import static org.eclipse.edc.connector.dataplane.spi.pipeline.StreamResult.erro
 import static org.eclipse.edc.connector.dataplane.spi.pipeline.StreamResult.success;
 public class NextCloudDataSource implements DataSource {
     private String fileName;
+    private String filePath;
+    private String url;
     private NextCloudApi nextCloudApi;
 
     @Override
     public StreamResult<Stream<Part>> openPartStream() {
-        return success(Stream.of(new nextCloudPart(nextCloudApi, fileName)));
+        return success(Stream.of(new nextCloudPart(nextCloudApi, fileName, filePath,url)));
     }
 
     @Override
@@ -28,10 +31,14 @@ public class NextCloudDataSource implements DataSource {
     private static class nextCloudPart  implements Part {
         private final NextCloudApi nextCloudApi;
         private String fileName;
+        private String filePath;
+        private String url;
 
-        public nextCloudPart(NextCloudApi nextCloudApi, String fileName) {
+        public nextCloudPart(NextCloudApi nextCloudApi, String fileName, String filePath, String url) {
             this.nextCloudApi = nextCloudApi;
             this.fileName = fileName;
+            this.filePath = filePath;
+            this.url = url;
         }
         @Override
         public String name() {
@@ -39,9 +46,9 @@ public class NextCloudDataSource implements DataSource {
         }
 
         @Override
-        public StreamResult<Stream<Part>> openStream() {
-            InputStream targetStream = new ByteArrayInputStream("");
-            return success(Stream.of(new HttpPart(name, body.byteStream())));
+        public InputStream openStream() {
+
+            return new ByteArrayInputStream( nextCloudApi.downloadFile(url));
         }
 
 
@@ -63,8 +70,14 @@ public class NextCloudDataSource implements DataSource {
             source.fileName = fileName;
             return this;
         }
-
-
+        public Builder filePath(String filePath) {
+            source.filePath = filePath;
+            return this;
+        }
+        public Builder url(String url) {
+            source.url = url;
+            return this;
+        }
         public Builder client(NextCloudApi nextCloudApi) {
             source.nextCloudApi = nextCloudApi;
             return this;
@@ -76,29 +89,5 @@ public class NextCloudDataSource implements DataSource {
 
     }
 
-    private static class HttpPart implements Part {
-        private final String name;
-        private final InputStream content;
 
-        HttpPart(String name, InputStream content) {
-            this.name = name;
-            this.content = content;
-        }
-
-        @Override
-        public String name() {
-            return name;
-        }
-
-        @Override
-        public long size() {
-            return SIZE_UNKNOWN;
-        }
-
-        @Override
-        public InputStream openStream() {
-            return content;
-        }
-
-    }
 }

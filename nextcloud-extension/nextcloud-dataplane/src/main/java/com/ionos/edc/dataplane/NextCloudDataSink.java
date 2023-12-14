@@ -13,7 +13,9 @@ import static java.lang.String.format;
 public class NextCloudDataSink extends ParallelSink {
 
     private NextCloudApi nextCloudApi;
+    private String filePath;
     private String fileName;
+
     public NextCloudDataSink() {
     }
 
@@ -21,8 +23,8 @@ public class NextCloudDataSink extends ParallelSink {
     protected StreamResult<Object> transferParts(List<DataSource.Part> parts) {
         for (var part : parts) {
             try (var input = part.openStream()) {
-                //aqui
 
+                nextCloudApi.uploadFile(filePath,fileName,new ByteArrayInputStream(input.readAllBytes()));
                 } catch (Exception e) {
                 return uploadFailure(e, fileName);
             }
@@ -51,6 +53,10 @@ public class NextCloudDataSink extends ParallelSink {
             return this;
         }
 
+        public Builder filePath(String filePath) {
+            sink.filePath = filePath;
+            return this;
+        }
         public Builder fileName(String fileName) {
             sink.fileName = fileName;
             return this;

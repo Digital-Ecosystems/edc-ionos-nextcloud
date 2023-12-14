@@ -1,7 +1,7 @@
 plugins {
     id("java")
     id("application")
-    id("com.github.johnrengelman.shadow") version "7.0.0"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 val edcGroup: String by project
@@ -9,6 +9,7 @@ val edcVersion: String by project
 
 repositories {
     mavenCentral()
+    gradlePluginPortal()
 }
 
 dependencies {
@@ -50,11 +51,9 @@ dependencies {
 application {
     mainClass.set("org.eclipse.edc.boot.system.runtime.BaseRuntime")
 }
-
-tasks.test {
-    useJUnitPlatform()
+tasks.shadowJar {
+    isZip64 = true
 }
-
 
 tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
     exclude("**/pom.properties", "**/pom.xm")
