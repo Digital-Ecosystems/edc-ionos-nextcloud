@@ -19,12 +19,13 @@ import org.jetbrains.annotations.NotNull;
 public class NextCloudDataSourceFactory  implements DataSourceFactory {
     private final Validator<DataAddress> validation = new NextCloudDataAddressValidator();
     private NextCloudApi nextCloudApi;
-    private Vault vault;
+    private final Vault vault;
     private final TypeManager typeManager;
 
-    public NextCloudDataSourceFactory(NextCloudApi nextCloudApi, TypeManager typeManager) {
+    public NextCloudDataSourceFactory(NextCloudApi nextCloudApi, TypeManager typeManager, Vault vault) {
         this.nextCloudApi = nextCloudApi;
         this.typeManager = typeManager;
+        this.vault = vault;
     }
 
     @Override

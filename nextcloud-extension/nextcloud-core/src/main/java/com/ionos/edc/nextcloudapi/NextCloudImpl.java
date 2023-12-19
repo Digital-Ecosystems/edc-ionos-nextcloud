@@ -95,14 +95,14 @@ public class NextCloudImpl implements NextCloudApi {
     @Override
     public void uploadFile(String filePath, String fileName, ByteArrayInputStream part) {
       //  PUT remote.php/dav/files/user/path/to/file
-         basicUrl = "http://localhost:8080";
 
         String urlPart = "/remote.php/dav/files/" + username + "/";
-        String url = basicUrl + urlPart + fileName;
+        String url = basicUrl + urlPart +filePath+ "/" +fileName;
 
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("file", fileName, RequestBody.create(MediaType.parse("application/octet-stream"), part.readAllBytes()))
+                .addFormDataPart("file", fileName, RequestBody.create( part.readAllBytes()))
+
                 .build();
 
         Request request = new Request.Builder()
@@ -116,8 +116,7 @@ public class NextCloudImpl implements NextCloudApi {
                 throw new IOException("Unexpected code " + response);
             }
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -126,7 +125,7 @@ public class NextCloudImpl implements NextCloudApi {
     private String retrieveId(String path, String fileName) {
          basicUrl = "http://localhost:8080";
 
-        String urlPart = "/remote.php/dav/files/" + username + "/";
+        String urlPart = "/remote.php/dav/files/" + username ;
         String url = basicUrl + urlPart + path+"/"+fileName;
         String body = "<?xml version=\"1.0\"?>\n" +
                 "<d:propfind  xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">\n" +

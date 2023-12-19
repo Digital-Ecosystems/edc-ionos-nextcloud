@@ -14,7 +14,7 @@ dependencies {
     implementation("${edcGroup}:transfer-spi:${edcVersion}")
     implementation("${edcGroup}:data-plane-util:${edcVersion}")
     implementation("${edcGroup}:data-plane-core:${edcVersion}")
-    implementation("${edcGroup}:http:${edcVersion}")
+
 
     implementation(project(":nextcloud-extension:nextcloud-core"))
     implementation("com.google.code.gson:gson:2.8.6")

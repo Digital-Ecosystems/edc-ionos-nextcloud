@@ -25,7 +25,7 @@ public class DataPlaneNextcloud  implements ServiceExtension {
 
     @Inject
     private TypeManager typeManager;
-
+    @Inject
     private NextCloudApi nextCloudApi;
 
     @Override
@@ -38,7 +38,7 @@ public class DataPlaneNextcloud  implements ServiceExtension {
 
         var monitor = context.getMonitor();
 
-        var sourceFactory = new  NextCloudDataSourceFactory(nextCloudApi, typeManager);
+        var sourceFactory = new  NextCloudDataSourceFactory(nextCloudApi, typeManager, vault);
         pipelineService.registerFactory(sourceFactory);
 
         var sinkFactory = new NextCloudDataSinkFactory(executorContainer.getExecutorService(), monitor, vault,

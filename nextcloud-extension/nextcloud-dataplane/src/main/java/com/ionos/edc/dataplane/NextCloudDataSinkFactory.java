@@ -56,20 +56,13 @@ public class NextCloudDataSinkFactory  implements DataSinkFactory {
             throw new EdcException(String.join(", ", validationResult.getFailureMessages()));
         }
         var destination = request.getDestinationDataAddress();;
-        var secret = vault.resolveSecret(destination.getKeyName());
-
-        if (secret != null) {
-            var token = typeManager.readValue(secret, NextCloudToken.class);
-
 
             return NextCloudDataSink.Builder.newInstance()
                     .filePath(destination.getStringProperty(NextcloudSchema.FILE_PATH))
                     .fileName(destination.getStringProperty(NextcloudSchema.FILE_NAME))
                     .requestId(request.getId()).executorService(executorService)
                     .monitor(monitor).nextCloudApi(nextCloudApi).build();
-        }else {
-            return null;
-        }
+
 
     }
 

@@ -1,5 +1,6 @@
 package com.ionos.edc.core;
 
+import com.ionos.edc.nextcloudapi.NextCloudApi;
 import com.ionos.edc.nextcloudapi.NextCloudImpl;
 import org.eclipse.edc.runtime.metamodel.annotation.Extension;
 import org.eclipse.edc.runtime.metamodel.annotation.Inject;
@@ -12,7 +13,7 @@ import org.eclipse.edc.spi.system.ServiceExtensionContext;
 import org.eclipse.edc.spi.security.CertificateResolver;
 import org.eclipse.edc.spi.security.PrivateKeyResolver;
 import com.ionos.edc.nextcloudapi.NextCloudApi;
-
+@Provides(NextCloudApi.class)
 @Extension(value = NextcloudExtensionCore.NAME)
 public class NextcloudExtensionCore implements ServiceExtension {
     public static final String NAME = "Nextcloud";
@@ -51,6 +52,6 @@ public class NextcloudExtensionCore implements ServiceExtension {
         var  nextApi = new NextCloudImpl(endpointKey, usernameKey, passwordKey);
         monitor.info("initiate "+this.NAME+" core");
 
-       // context.registerService(NextcloudExtensionCore.class, nextApi);
+        context.registerService(NextCloudApi.class, nextApi);
     }
 }

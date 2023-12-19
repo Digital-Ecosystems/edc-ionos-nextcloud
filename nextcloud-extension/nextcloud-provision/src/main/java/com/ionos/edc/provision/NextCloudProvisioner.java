@@ -18,6 +18,7 @@ import java.util.concurrent.CompletableFuture;
 public class NextCloudProvisioner  implements Provisioner<NextCloudResourceDefinition, NextCloudProvisionedResource> {
     private  RetryPolicy<Object> retryPolicy;
     private  Monitor monitor;
+
     private NextCloudApi nextCloudApi;
 
 
@@ -43,12 +44,13 @@ public class NextCloudProvisioner  implements Provisioner<NextCloudResourceDefin
 
             String fileName = resourceDefinition.getFileName();
             String filePath = resourceDefinition.getFilePath();
+         String resourceName = resourceDefinition.getKeyName();
 
-            var urlKey = nextCloudApi.generateUrlDownload(filePath,fileName);
 
 
             var resourceBuilder = NextCloudProvisionedResource.Builder.newInstance()
                     .id(resourceDefinition.getId())
+                    .resourceName(resourceName)
                     .filePath(filePath)
                     .fileName(fileName)
                     .urlKey(filePath+fileName+resourceDefinition.getId())
@@ -63,7 +65,7 @@ public class NextCloudProvisioner  implements Provisioner<NextCloudResourceDefin
         }
 
             var resource = resourceBuilder.build();
-
+        var urlKey = nextCloudApi.generateUrlDownload("",fileName);
             var expiryTime = OffsetDateTime.now().plusHours(1);
             var urlToken = new NextCloudToken(urlKey, expiryTime.toInstant().toEpochMilli() );
             var response = ProvisionResponse.Builder.newInstance().resource(resource).secretToken(urlToken).build();

@@ -19,12 +19,14 @@ public class NextCloudConsumerResourceDefinitionGenerator  implements ConsumerRe
 
         var destination = dataRequest.getDataDestination();
         var id = randomUUID().toString();
+        var keyName = destination.getKeyName();
         var filePath = destination.getStringProperty(NextcloudSchema.FILE_PATH);
         var fileName = destination.getStringProperty(NextcloudSchema.FILE_NAME);
 
 
         return  NextCloudResourceDefinition.Builder.newInstance()
                 .id(id)
+                .keyName(keyName)
                 .filePath(filePath)
                 .fileName(fileName)
                 .build();
