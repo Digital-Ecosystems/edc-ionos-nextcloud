@@ -94,22 +94,23 @@ public class NextCloudImpl implements NextCloudApi {
 
     @Override
     public void uploadFile(String filePath, String fileName, ByteArrayInputStream part) {
-      //  PUT remote.php/dav/files/user/path/to/file
+
 
         String urlPart = "/remote.php/dav/files/" + username + "/";
         String url = basicUrl + urlPart +filePath+ "/" +fileName;
 
-        RequestBody requestBody = new MultipartBody.Builder()
-                .setType(MultipartBody.FORM)
-                .addFormDataPart("file", fileName, RequestBody.create( part.readAllBytes()))
 
-                .build();
+
+        MediaType mediaType = MediaType.parse("application/octet-stream");
+
+        RequestBody body = RequestBody.Companion.create(part.readAllBytes(), mediaType);
+
 
         Request request = new Request.Builder()
                 .url(url)
                 .addHeader("OCS-APIRequest", "true")
                 .addHeader("Authorization", Credentials.basic(username, password))
-                .put(requestBody)
+                .put(body)
                 .build();
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
