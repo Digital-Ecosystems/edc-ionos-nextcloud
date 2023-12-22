@@ -7,15 +7,21 @@ import org.eclipse.edc.connector.transfer.spi.types.SecretToken;
 @JsonTypeName("dataspaceconnector:nexcloudtoken")
 public class NextCloudToken implements SecretToken {
     private final String urlToken;
+    private Boolean downloadable;
     private final long expiration;
 
-    public NextCloudToken(@JsonProperty("urlKey") String urlToken,@JsonProperty("expiration") long expiration) {
+    public NextCloudToken(@JsonProperty("urlKey") String urlToken,@JsonProperty("downloadable") Boolean downloadable, @JsonProperty("expiration") long expiration) {
         this.urlToken = urlToken;
+        this.downloadable = downloadable;
         this.expiration = expiration;
     }
 
     public String getUrlToken() {
         return urlToken;
+    }
+
+    public Boolean getDownloadable() {
+        return downloadable;
     }
 
     @Override

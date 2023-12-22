@@ -5,9 +5,11 @@ import com.ionos.edc.nextcloudapi.NextCloudApi;
 import com.ionos.edc.schema.NextcloudSchema;
 
 import com.ionos.edc.token.NextCloudToken;
+import dev.failsafe.RetryPolicy;
 import org.eclipse.edc.connector.dataplane.spi.pipeline.DataSource;
 import org.eclipse.edc.connector.dataplane.spi.pipeline.DataSourceFactory;
 
+import org.eclipse.edc.policy.model.Policy;
 import org.eclipse.edc.spi.result.Result;
 import org.eclipse.edc.spi.security.Vault;
 import org.eclipse.edc.spi.types.TypeManager;
@@ -22,7 +24,7 @@ public class NextCloudDataSourceFactory  implements DataSourceFactory {
     private final Vault vault;
     private final TypeManager typeManager;
 
-    public NextCloudDataSourceFactory(NextCloudApi nextCloudApi, TypeManager typeManager, Vault vault) {
+    public NextCloudDataSourceFactory(NextCloudApi nextCloudApi, TypeManager typeManager, Vault vault ) {
         this.nextCloudApi = nextCloudApi;
         this.typeManager = typeManager;
         this.vault = vault;
@@ -50,12 +52,14 @@ public class NextCloudDataSourceFactory  implements DataSourceFactory {
 
         if (secret != null) {
             var token = typeManager.readValue(secret, NextCloudToken.class);
+            if(token.getDownloadable())
+                return NextCloudDataSource.Builder.newInstance().client(nextCloudApi)
+                        .filePath(source.getStringProperty(NextcloudSchema.FILE_PATH))
+                        .fileName(source.getStringProperty(NextcloudSchema.FILE_NAME))
+                        .url(token.getUrlToken())
+                        .build();
 
-            return NextCloudDataSource.Builder.newInstance().client(nextCloudApi)
-                    .filePath(source.getStringProperty(NextcloudSchema.FILE_PATH))
-                    .fileName(source.getStringProperty(NextcloudSchema.FILE_NAME))
-                    .url(token.getUrlToken())
-                    .build();
+            else  return null;
         } else {
             return null;
         }

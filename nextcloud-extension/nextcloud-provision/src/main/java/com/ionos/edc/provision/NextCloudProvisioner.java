@@ -8,6 +8,9 @@ import org.eclipse.edc.connector.transfer.spi.types.DeprovisionedResource;
 import org.eclipse.edc.connector.transfer.spi.types.ProvisionResponse;
 import org.eclipse.edc.connector.transfer.spi.types.ProvisionedResource;
 import org.eclipse.edc.connector.transfer.spi.types.ResourceDefinition;
+import org.eclipse.edc.policy.model.AtomicConstraint;
+import org.eclipse.edc.policy.model.Constraint;
+import org.eclipse.edc.policy.model.Expression;
 import org.eclipse.edc.policy.model.Policy;
 import org.eclipse.edc.spi.monitor.Monitor;
 import org.eclipse.edc.spi.response.StatusResult;
@@ -40,37 +43,63 @@ public class NextCloudProvisioner  implements Provisioner<NextCloudResourceDefin
 
     @Override
     public CompletableFuture<StatusResult<ProvisionResponse>> provision(NextCloudResourceDefinition resourceDefinition, Policy policy) {
+        String fileName = resourceDefinition.getFileName();
+        String filePath = resourceDefinition.getFilePath();
+        String resourceName = resourceDefinition.getKeyName();
 
+        AtomicConstraint ct = (AtomicConstraint) policy.getProhibitions().get(0).getConstraints().get(0);
 
-            String fileName = resourceDefinition.getFileName();
-            String filePath = resourceDefinition.getFilePath();
-         String resourceName = resourceDefinition.getKeyName();
+        if(Boolean.parseBoolean(ct.getRightExpression().toString().replace("'",""))) {
 
+                var resourceBuilder = NextCloudProvisionedResource.Builder.newInstance()
+                        .id(resourceDefinition.getId())
+                        .resourceName(resourceName)
+                        .filePath(filePath)
+                        .fileName(fileName)
+                        .urlKey(filePath + fileName + resourceDefinition.getId())
+                        .resourceDefinitionId(resourceDefinition.getId())
+                        .transferProcessId(resourceDefinition.getTransferProcessId())
+                        .hasToken(true);
+                if (resourceDefinition.getFilePath() != null) {
+                    resourceBuilder = resourceBuilder.filePath(resourceDefinition.getFilePath());
+                }
+                if (resourceDefinition.getFileName() != null) {
+                    resourceBuilder = resourceBuilder.fileName(resourceDefinition.getFileName());
+                }
 
+                var resource = resourceBuilder.build();
+                var urlKey = nextCloudApi.generateUrlDownload("", fileName);
+                var expiryTime = OffsetDateTime.now().plusHours(1);
+                var urlToken = new NextCloudToken(urlKey,true ,expiryTime.toInstant().toEpochMilli());
+                var response = ProvisionResponse.Builder.newInstance().resource(resource).secretToken(urlToken).build();
 
+                return CompletableFuture.completedFuture(StatusResult.success(response));
+            }else {
             var resourceBuilder = NextCloudProvisionedResource.Builder.newInstance()
                     .id(resourceDefinition.getId())
                     .resourceName(resourceName)
                     .filePath(filePath)
                     .fileName(fileName)
-                    .urlKey(filePath+fileName+resourceDefinition.getId())
+                    .urlKey(filePath + fileName + resourceDefinition.getId())
                     .resourceDefinitionId(resourceDefinition.getId())
                     .transferProcessId(resourceDefinition.getTransferProcessId())
                     .hasToken(true);
             if (resourceDefinition.getFilePath() != null) {
                 resourceBuilder = resourceBuilder.filePath(resourceDefinition.getFilePath());
             }
-        if (resourceDefinition.getFileName() != null) {
-            resourceBuilder = resourceBuilder.fileName(resourceDefinition.getFileName());
-        }
-
+            if (resourceDefinition.getFileName() != null) {
+                resourceBuilder = resourceBuilder.fileName(resourceDefinition.getFileName());
+            }
             var resource = resourceBuilder.build();
-        var urlKey = nextCloudApi.generateUrlDownload("",fileName);
             var expiryTime = OffsetDateTime.now().plusHours(1);
-            var urlToken = new NextCloudToken(urlKey, expiryTime.toInstant().toEpochMilli() );
+            var urlToken = new NextCloudToken("",false ,expiryTime.toInstant().toEpochMilli());
+
             var response = ProvisionResponse.Builder.newInstance().resource(resource).secretToken(urlToken).build();
 
+            nextCloudApi.fileShare(filePath,fileName,"user1","0");
             return CompletableFuture.completedFuture(StatusResult.success(response));
+
+        }
     }
 
     @Override

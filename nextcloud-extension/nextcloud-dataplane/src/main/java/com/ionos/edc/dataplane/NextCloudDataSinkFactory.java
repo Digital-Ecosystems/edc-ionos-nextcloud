@@ -4,8 +4,10 @@ import com.ionos.edc.nextcloudapi.NextCloudApi;
 import com.ionos.edc.nextcloudapi.NextCloudImpl;
 import com.ionos.edc.schema.NextcloudSchema;
 import com.ionos.edc.token.NextCloudToken;
+import dev.failsafe.RetryPolicy;
 import org.eclipse.edc.connector.dataplane.spi.pipeline.DataSink;
 import org.eclipse.edc.connector.dataplane.spi.pipeline.DataSinkFactory;
+import org.eclipse.edc.policy.model.Policy;
 import org.eclipse.edc.spi.types.domain.DataAddress;
 import org.eclipse.edc.validator.spi.Validator;
 import org.eclipse.edc.spi.EdcException;
@@ -27,6 +29,7 @@ public class NextCloudDataSinkFactory  implements DataSinkFactory {
     private TypeManager typeManager;
 
     private NextCloudApi nextCloudApi;
+
 
     public NextCloudDataSinkFactory(@NotNull ExecutorService executorService, Monitor monitor, Vault vault, TypeManager typeManager, NextCloudApi nextCloudApi) {
         this.executorService = executorService;
@@ -55,15 +58,25 @@ public class NextCloudDataSinkFactory  implements DataSinkFactory {
         if (validationResult.failed()) {
             throw new EdcException(String.join(", ", validationResult.getFailureMessages()));
         }
+
         var destination = request.getDestinationDataAddress();;
+        var secret = vault.resolveSecret(destination.getKeyName());
+        if (secret != null) {
+            var token = typeManager.readValue(secret, NextCloudToken.class);
+            if (token.getDownloadable()) {
+                return NextCloudDataSink.Builder.newInstance()
+                        .filePath(destination.getStringProperty(NextcloudSchema.FILE_PATH))
+                        .fileName(destination.getStringProperty(NextcloudSchema.FILE_NAME))
+                        .requestId(request.getId()).executorService(executorService)
+                        .monitor(monitor).nextCloudApi(nextCloudApi).build();
+            } else {
+                return null;
+            }
+            } else {
+            return null;
+            }
+        }
 
-            return NextCloudDataSink.Builder.newInstance()
-                    .filePath(destination.getStringProperty(NextcloudSchema.FILE_PATH))
-                    .fileName(destination.getStringProperty(NextcloudSchema.FILE_NAME))
-                    .requestId(request.getId()).executorService(executorService)
-                    .monitor(monitor).nextCloudApi(nextCloudApi).build();
 
-
-    }
 
 }

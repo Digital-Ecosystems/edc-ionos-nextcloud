@@ -2,23 +2,13 @@ package com.ionos.edc.nextcloudapi;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-
-import okhttp3.*;
-
-
 import okhttp3.*;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-
-import java.io.IOException;
-
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+
 
 public class NextCloudImpl implements NextCloudApi {
-    private final String OC_URL = "url";
-    private final String OC_FILEID = "oc|fileid";
 
     OkHttpClient client = new OkHttpClient();
     String basicUrl = "";
@@ -59,9 +49,10 @@ public class NextCloudImpl implements NextCloudApi {
 
             String xmlResponse = response.body().string();
             Document document = Jsoup.parse(xmlResponse);
-            String urlValue = document.select(OC_URL).text();
+            String OC_URL = "url";
 
-            return urlValue;
+
+            return document.select(OC_URL).text();
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -86,8 +77,6 @@ public class NextCloudImpl implements NextCloudApi {
 
             return in.readAllBytes();
         } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -123,6 +112,31 @@ public class NextCloudImpl implements NextCloudApi {
         }
     }
 
+    @Override
+    public void fileShare(String filePath, String fileName, String user, String permissionType) {
+
+        String FILESHARE_ADDRESS = "/ocs/v2.php/apps/files_sharing/api/v1/shares?";
+        String url = basicUrl + FILESHARE_ADDRESS +
+                "path=" +filePath +"/"+ fileName + "&shareType=0&shareWith=" + user + "&publicUpload=false&permissions=" + permissionType;
+
+
+        HttpUrl urlHttp = HttpUrl.parse(url);
+        Request request = new Request.Builder()
+                .url(urlHttp)
+                .addHeader("OCS-APIRequest", "true")
+                .addHeader("Authorization", Credentials.basic(username, password))
+                .post(RequestBody.create(null, ""))
+                .build();
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                throw new IOException("Unexpected code " + response);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
     private String retrieveId(String path, String fileName) {
          basicUrl = "http://localhost:8080";
 
@@ -149,6 +163,7 @@ public class NextCloudImpl implements NextCloudApi {
 
             String xmlResponse = response.body().string();
             Document document = Jsoup.parse(xmlResponse);
+            String OC_FILEID = "oc|fileid";
             String fileId = document.select(OC_FILEID).text();
             return fileId;
         } catch (IOException e) {
