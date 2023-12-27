@@ -16,11 +16,14 @@ public class NextCloudDataSource implements DataSource {
     private String fileName;
     private String filePath;
     private String url;
+    private Boolean downloadable;
     private NextCloudApi nextCloudApi;
 
     @Override
     public StreamResult<Stream<Part>> openPartStream() {
-        return success(Stream.of(new nextCloudPart(nextCloudApi, fileName, filePath,url)));
+
+            return success(Stream.of(new nextCloudPart(nextCloudApi, fileName, filePath, url, downloadable)));
+
     }
 
     @Override
@@ -33,13 +36,16 @@ public class NextCloudDataSource implements DataSource {
         private String fileName;
         private String filePath;
         private String url;
+        private Boolean downloadable;
 
-        public nextCloudPart(NextCloudApi nextCloudApi, String fileName, String filePath, String url) {
+        public nextCloudPart(NextCloudApi nextCloudApi, String fileName, String filePath, String url, Boolean downloadable) {
             this.nextCloudApi = nextCloudApi;
             this.fileName = fileName;
             this.filePath = filePath;
             this.url = url;
+            this.downloadable = downloadable;
         }
+
         @Override
         public String name() {
             return fileName;
@@ -47,8 +53,11 @@ public class NextCloudDataSource implements DataSource {
 
         @Override
         public InputStream openStream() {
-
-            return new ByteArrayInputStream( nextCloudApi.downloadFile(url));
+            if(downloadable) {
+                return new ByteArrayInputStream(nextCloudApi.downloadFile(url));
+            }else {
+                return new ByteArrayInputStream("".getBytes());
+            }
         }
 
 
@@ -76,6 +85,10 @@ public class NextCloudDataSource implements DataSource {
         }
         public Builder url(String url) {
             source.url = url;
+            return this;
+        }
+        public Builder downloadable(Boolean downloadable) {
+            source.downloadable = downloadable;
             return this;
         }
         public Builder client(NextCloudApi nextCloudApi) {

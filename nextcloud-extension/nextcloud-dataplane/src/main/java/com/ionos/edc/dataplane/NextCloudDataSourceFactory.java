@@ -52,14 +52,15 @@ public class NextCloudDataSourceFactory  implements DataSourceFactory {
 
         if (secret != null) {
             var token = typeManager.readValue(secret, NextCloudToken.class);
-            if(token.getDownloadable())
-                return NextCloudDataSource.Builder.newInstance().client(nextCloudApi)
+
+            return NextCloudDataSource.Builder.newInstance().client(nextCloudApi)
                         .filePath(source.getStringProperty(NextcloudSchema.FILE_PATH))
                         .fileName(source.getStringProperty(NextcloudSchema.FILE_NAME))
+                        .downloadable(token.getDownloadable())
                         .url(token.getUrlToken())
                         .build();
 
-            else  return null;
+
         } else {
             return null;
         }

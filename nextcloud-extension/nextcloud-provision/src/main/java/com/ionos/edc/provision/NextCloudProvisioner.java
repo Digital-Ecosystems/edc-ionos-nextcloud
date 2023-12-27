@@ -12,11 +12,14 @@ import org.eclipse.edc.policy.model.AtomicConstraint;
 import org.eclipse.edc.policy.model.Constraint;
 import org.eclipse.edc.policy.model.Expression;
 import org.eclipse.edc.policy.model.Policy;
+import org.eclipse.edc.spi.EdcException;
 import org.eclipse.edc.spi.monitor.Monitor;
 import org.eclipse.edc.spi.response.StatusResult;
 
 import java.time.OffsetDateTime;
 import java.util.concurrent.CompletableFuture;
+
+import static dev.failsafe.Failsafe.with;
 
 public class NextCloudProvisioner  implements Provisioner<NextCloudResourceDefinition, NextCloudProvisionedResource> {
     private  RetryPolicy<Object> retryPolicy;
@@ -48,7 +51,9 @@ public class NextCloudProvisioner  implements Provisioner<NextCloudResourceDefin
         String resourceName = resourceDefinition.getKeyName();
 
         AtomicConstraint ct = (AtomicConstraint) policy.getProhibitions().get(0).getConstraints().get(0);
-
+        if(policy.getProhibitions().size() ==0 ){
+             throw new EdcException("No Prohibition available");
+        }
         if(Boolean.parseBoolean(ct.getRightExpression().toString().replace("'",""))) {
 
                 var resourceBuilder = NextCloudProvisionedResource.Builder.newInstance()
@@ -104,7 +109,7 @@ public class NextCloudProvisioner  implements Provisioner<NextCloudResourceDefin
 
     @Override
     public CompletableFuture<StatusResult<DeprovisionedResource>> deprovision(NextCloudProvisionedResource provisionedResource, Policy policy) {
-        return null;
+      return CompletableFuture.completedFuture(StatusResult.success(DeprovisionedResource.Builder.newInstance().provisionedResourceId(provisionedResource.getId()).build()));
     }
 
 

@@ -63,15 +63,14 @@ public class NextCloudDataSinkFactory  implements DataSinkFactory {
         var secret = vault.resolveSecret(destination.getKeyName());
         if (secret != null) {
             var token = typeManager.readValue(secret, NextCloudToken.class);
-            if (token.getDownloadable()) {
+
                 return NextCloudDataSink.Builder.newInstance()
                         .filePath(destination.getStringProperty(NextcloudSchema.FILE_PATH))
                         .fileName(destination.getStringProperty(NextcloudSchema.FILE_NAME))
+                        .downloadable(token.getDownloadable())
                         .requestId(request.getId()).executorService(executorService)
                         .monitor(monitor).nextCloudApi(nextCloudApi).build();
-            } else {
-                return null;
-            }
+
             } else {
             return null;
             }

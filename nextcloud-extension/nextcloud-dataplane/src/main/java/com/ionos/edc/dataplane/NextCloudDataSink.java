@@ -15,21 +15,23 @@ public class NextCloudDataSink extends ParallelSink {
     private NextCloudApi nextCloudApi;
     private String filePath;
     private String fileName;
-
+    private Boolean downloadable;
     public NextCloudDataSink() {
     }
 
     @Override
     protected StreamResult<Object> transferParts(List<DataSource.Part> parts) {
-        for (var part : parts) {
-            try (var input = part.openStream()) {
+        if(downloadable) {
+            for (var part : parts) {
+                try (var input = part.openStream()) {
 
-                nextCloudApi.uploadFile(filePath,fileName,new ByteArrayInputStream(input.readAllBytes()));
+                    nextCloudApi.uploadFile(filePath, fileName, new ByteArrayInputStream(input.readAllBytes()));
                 } catch (Exception e) {
-                return uploadFailure(e, fileName);
+                    return uploadFailure(e, fileName);
+                }
             }
         }
-        return StreamResult.success();
+        return StreamResult.success(new ByteArrayInputStream("".getBytes()));
     }
     @NotNull
     private StreamResult<Object> uploadFailure(Exception e, String fileName) {
@@ -59,6 +61,10 @@ public class NextCloudDataSink extends ParallelSink {
         }
         public Builder fileName(String fileName) {
             sink.fileName = fileName;
+            return this;
+        }
+        public Builder downloadable(Boolean downloadable) {
+            sink.downloadable = downloadable;
             return this;
         }
 

@@ -3,6 +3,7 @@ package com.ionos.edc.nextcloudapi;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import okhttp3.*;
+import org.eclipse.edc.spi.EdcException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import java.io.InputStream;
@@ -44,7 +45,7 @@ public class NextCloudImpl implements NextCloudApi {
                 .build();
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
-                throw new IOException("Unexpected code " + response);
+                throw new EdcException("Unexpected code " + response);
             }
 
             String xmlResponse = response.body().string();
@@ -55,7 +56,7 @@ public class NextCloudImpl implements NextCloudApi {
             return document.select(OC_URL).text();
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new EdcException("Error generation URL"+ e);
         }
 
     }
@@ -77,7 +78,7 @@ public class NextCloudImpl implements NextCloudApi {
 
             return in.readAllBytes();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new EdcException("Error when downloading the file: "+e);
         }
     }
 
@@ -108,7 +109,7 @@ public class NextCloudImpl implements NextCloudApi {
 
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new EdcException("Error uploading file: "+ e);
         }
     }
 
@@ -129,10 +130,10 @@ public class NextCloudImpl implements NextCloudApi {
                 .build();
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
-                throw new IOException("Unexpected code " + response);
+                throw new EdcException("Unexpected code " + response);
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new EdcException("Error when granting sharing permissions: "+ e);
         }
     }
 
@@ -158,7 +159,7 @@ public class NextCloudImpl implements NextCloudApi {
 
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
-                throw new IOException("Unexpected code " + response);
+                throw new EdcException("Unexpected code " + response);
             }
 
             String xmlResponse = response.body().string();
@@ -167,7 +168,7 @@ public class NextCloudImpl implements NextCloudApi {
             String fileId = document.select(OC_FILEID).text();
             return fileId;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new EdcException("Error fetching id from file: "+e);
         }
     }
 }
