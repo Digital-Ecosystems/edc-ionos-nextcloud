@@ -50,7 +50,7 @@ public class NextCloudDataSourceFactory  implements DataSourceFactory {
 
         var secret = vault.resolveSecret(destination.getKeyName());
 
-        if (secret != null) {
+        if (secret != null && secret.contains("dataspaceconnector:nexcloudtoken")) {
             var token = typeManager.readValue(secret, NextCloudToken.class);
 
             return NextCloudDataSource.Builder.newInstance().client(nextCloudApi)
@@ -61,8 +61,22 @@ public class NextCloudDataSourceFactory  implements DataSourceFactory {
                         .build();
 
 
-        } else {
-            return null;
+        }else if(secret != null){
+            var urlKey = nextCloudApi.generateUrlDownload(source.getStringProperty(NextcloudSchema.FILE_PATH), source.getStringProperty(NextcloudSchema.FILE_NAME));
+
+
+            return NextCloudDataSource.Builder.newInstance().client(nextCloudApi)
+                    .filePath(source.getStringProperty(NextcloudSchema.FILE_PATH))
+                    .fileName(source.getStringProperty(NextcloudSchema.FILE_NAME))
+                    .downloadable(true)
+                    .url(urlKey)
+                    .build();
+        }else{
+            return NextCloudDataSource.Builder.newInstance().client(nextCloudApi)
+                    .filePath(source.getStringProperty(NextcloudSchema.FILE_PATH))
+                    .fileName(source.getStringProperty(NextcloudSchema.FILE_NAME))
+                    .downloadable(false)
+                    .build();
         }
 
     }

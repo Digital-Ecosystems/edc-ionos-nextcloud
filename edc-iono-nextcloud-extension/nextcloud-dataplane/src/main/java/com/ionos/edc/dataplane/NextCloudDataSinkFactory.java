@@ -72,7 +72,11 @@ public class NextCloudDataSinkFactory  implements DataSinkFactory {
                         .monitor(monitor).nextCloudApi(nextCloudApi).build();
 
             } else {
-            return null;
+            return NextCloudDataSink.Builder.newInstance()
+                    .filePath(destination.getStringProperty(NextcloudSchema.FILE_PATH))
+                    .fileName(destination.getStringProperty(NextcloudSchema.FILE_NAME))
+                    .requestId(request.getId()).executorService(executorService)
+                    .monitor(monitor).nextCloudApi(nextCloudApi).build();
             }
         }
 
