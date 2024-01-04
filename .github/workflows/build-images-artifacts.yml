@@ -40,7 +40,9 @@ jobs:
         run: chmod +x ./gradlew
       - name: Prepare required files
         run: ./gradlew clean build
-
+        env:
+          USERNAME_GITHUB: ${{ secrets.USERNAME_GITHUB }}
+          TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
       - name: downcase NAMESPACE
         run: |
           echo "NAMESPACE=${REPOSITORY_OWNER,,}" >>${GITHUB_ENV}
@@ -95,7 +97,9 @@ jobs:
         run: chmod +x ./gradlew
       - name: Build project
         run: ./gradlew clean build
-
+        env:
+          USERNAME_GITHUB: ${{ secrets.USERNAME_GITHUB }}
+          TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
       - name: Publish artifacts to GitHub Packages
         run: |
           ./gradlew -PextensionsVersion=${{ github.ref_name }} \
