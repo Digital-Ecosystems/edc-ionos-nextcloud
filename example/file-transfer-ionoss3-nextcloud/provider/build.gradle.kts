@@ -10,10 +10,7 @@ val ionosVersion: String by project
 repositories {
     maven {
         url = uri("https://maven.pkg.github.com/Digital-Ecosystems/edc-ionos-s3/")
-        credentials {
-            username = project.findProperty("gpr.user") as String? ?: "paulolory-ionos"
-            password = project.findProperty("gpr.key") as String? ?: "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"
-        }
+
     }
 
     mavenLocal()
