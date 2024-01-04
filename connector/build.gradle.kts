@@ -42,8 +42,8 @@ dependencies {
 
     implementation("${edcGroup}:data-plane-selector-client:${edcVersion}")
 
-    implementation(project(":edc-iono-nextcloud-extension:nextcloud-core"))
-
+    implementation(project(":edc-iono-nextcloud-extension:nextcloud-dataplane"))
+    implementation(project(":edc-iono-nextcloud-extension:nextcloud-provision"))
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
