@@ -51,7 +51,7 @@ jobs:
         id: connector-meta
         uses: docker/metadata-action@v4
         with:
-          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/connector
+          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/nextcloud-connector
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             ${{ github.ref_name }}
@@ -75,7 +75,7 @@ jobs:
       - name: Sign "connector" image
         run: |
           cosign sign -y --key cosign.key \
-          ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/connector@${{ steps.build-and-push-connector.outputs.digest }}
+          ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/nextcloud-connector@${{ steps.build-and-push-connector.outputs.digest }}
         env:
           COSIGN_PASSWORD: ${{ secrets.SIGNING_SECRET_PASSWORD }}
 
@@ -104,6 +104,6 @@ jobs:
         run: |
           ./gradlew -PextensionsVersion=${{ github.ref_name }} \
           -Pgithub_owner=${{ github.repository_owner }} \
-          -Pgithub_repo=edc-ionos-s3 publish \
+          -Pgithub_repo=edc-ionos-nextcloud publish \
           -Dorg.gradle.project.gitHubUser=${{ github.actor }} \
           -Dorg.gradle.project.gitHubToken=${{ secrets.GITHUB_TOKEN }}
