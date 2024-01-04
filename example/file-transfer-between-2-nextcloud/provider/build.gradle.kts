@@ -45,11 +45,11 @@ application {
     mainClass.set("org.eclipse.edc.boot.system.runtime.BaseRuntime")
 }
 tasks.shadowJar {
-isZip64 = true
+    isZip64 = true
 }
 
 tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
-exclude("**/pom.properties", "**/pom.xm")
-mergeServiceFiles()
-archiveFileName.set("connector.jar")
+    exclude("**/pom.properties", "**/pom.xm")
+    mergeServiceFiles()
+    archiveFileName.set("connector.jar")
 }
