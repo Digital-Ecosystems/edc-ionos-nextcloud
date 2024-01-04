@@ -37,7 +37,7 @@ jobs:
           buildkitd-flags: --debug
 
       - name: Prepare required files
-        run: ./gradlew clean build
+        run: chmod +x ./gradlew clean build
 
       - name: downcase NAMESPACE
         run: |
