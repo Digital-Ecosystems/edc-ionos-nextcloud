@@ -36,8 +36,10 @@ jobs:
         with:
           buildkitd-flags: --debug
 
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
       - name: Prepare required files
-        run: chmod +x ./gradlew clean build
+        run: ./gradlew clean build
 
       - name: downcase NAMESPACE
         run: |
@@ -89,7 +91,8 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
       - name: Build project
         run: ./gradlew clean build
 
