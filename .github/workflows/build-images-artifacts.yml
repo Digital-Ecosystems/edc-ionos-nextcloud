@@ -72,12 +72,7 @@ jobs:
           tags: ${{ steps.connector-meta.outputs.tags }}
           labels: ${{ steps.connector-meta.outputs.labels }}
 
-      - name: Sign "connector" image
-        run: |
-          cosign sign -y --key cosign.key \
-          ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/nextcloud-connector@${{ steps.build-and-push-connector.outputs.digest }}
-        env:
-          COSIGN_PASSWORD: ${{ secrets.SIGNING_SECRET_PASSWORD }}
+      
 
   build-and-publish-artifacts:
     runs-on: ubuntu-latest
