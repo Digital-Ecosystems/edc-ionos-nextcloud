@@ -34,7 +34,7 @@ dependencies{
 
     implementation("${edcGroup}:vault-hashicorp:${edcVersion}")
 
-    implementation(project(":edc-iono-nextcloud-extension:nextcloud-provision"))
+    implementation(project(":edc-ionos-nextcloud-extension:nextcloud-provision"))
 
     implementation("${edcGroup}:iam-mock:${edcVersion}")
 

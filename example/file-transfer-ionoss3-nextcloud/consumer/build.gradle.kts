@@ -40,7 +40,7 @@ dependencies{
     implementation("${edcGroup}:vault-hashicorp:${edcVersion}")
     implementation("${edcGroup}:iam-mock:${edcVersion}")
 
-    implementation(project(":edc-iono-nextcloud-extension:nextcloud-dataplane"))
+    implementation(project(":edc-ionos-nextcloud-extension:nextcloud-dataplane"))
     implementation ("${ionosGroup}:data-plane-ionos-s3:${ionosVersion}")
 
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
