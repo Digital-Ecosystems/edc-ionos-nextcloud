@@ -5,12 +5,13 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import org.eclipse.edc.connector.transfer.spi.types.ProvisionedDataAddressResource;
 import org.eclipse.edc.connector.transfer.spi.types.ProvisionedDataDestinationResource;
 
 import static com.ionos.edc.schema.NextcloudSchema.*;
 @JsonDeserialize(builder = NextCloudProvisionedResource.Builder.class)
 @JsonTypeName("dataspaceconnector:nextcloudprovisionedresource")
-public class NextCloudProvisionedResource  extends ProvisionedDataDestinationResource {
+public class NextCloudProvisionedResource  extends ProvisionedDataDestinationResource{
     private String urlKey;
     public String getFilePath() {
         return getDataAddress().getStringProperty(FILE_PATH);

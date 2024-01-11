@@ -8,6 +8,7 @@ import org.eclipse.edc.connector.transfer.spi.provision.ResourceManifestGenerato
 
 import org.eclipse.edc.runtime.metamodel.annotation.Extension;
 import org.eclipse.edc.runtime.metamodel.annotation.Inject;
+import org.eclipse.edc.spi.asset.AssetIndex;
 import org.eclipse.edc.spi.monitor.Monitor;
 import org.eclipse.edc.spi.security.Vault;
 import org.eclipse.edc.spi.system.ServiceExtension;
@@ -29,6 +30,9 @@ public class ProvisionNextCloud implements ServiceExtension {
     @Inject
     private NextCloudApi nextCloudApi;
 
+    @Inject
+    private AssetIndex assetIndex;
+
     @Override
     public String name() {
         return NAME;
@@ -42,14 +46,14 @@ public class ProvisionNextCloud implements ServiceExtension {
         monitor.debug("NextCloudProvisionExtension" + "retryPolicy");
         var retryPolicy = (RetryPolicy<Object>) context.getService(RetryPolicy.class);
         monitor.debug("NextCloudProvisionExtension");
-        var nextCloudProvisioner = new NextCloudProvisioner(retryPolicy, monitor, nextCloudApi);
+        var nextCloudProvisioner = new NextCloudProvisioner(retryPolicy, monitor, nextCloudApi, assetIndex);
         provisionManager.register(nextCloudProvisioner);
 
         // register the generator
         monitor.debug("NextCloudProvisionExtension" + "manifestGenerator");
         var manifestGenerator = context.getService(ResourceManifestGenerator.class);
         manifestGenerator.registerGenerator(new NextCloudConsumerResourceDefinitionGenerator());
-        
+        manifestGenerator.registerGenerator(new NextCloudProviderResourceDefinitionGenerator());
         registerTypes(typeManager);
     }
 
