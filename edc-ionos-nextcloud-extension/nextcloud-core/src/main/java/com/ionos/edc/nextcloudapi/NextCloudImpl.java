@@ -142,7 +142,7 @@ public class NextCloudImpl implements NextCloudApi {
          basicUrl = "http://localhost:8080";
 
         String urlPart = "/remote.php/dav/files/" + username ;
-        String url = basicUrl + urlPart + path+"/"+fileName;
+        String url = basicUrl + urlPart+"/" + path+"/"+fileName;
         String body = "<?xml version=\"1.0\"?>\n" +
                 "<d:propfind  xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">\n" +
                 "  <d:prop>\n" +

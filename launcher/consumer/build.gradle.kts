@@ -5,42 +5,39 @@ plugins {
 }
 val edcGroup: String by project
 val edcVersion: String by project
-
 repositories {
+
+
+    mavenLocal()
     mavenCentral()
 }
 
-dependencies{
-
+dependencies {
+    implementation("${edcGroup}:boot:${edcVersion}")
     implementation("${edcGroup}:control-plane-core:${edcVersion}")
+    implementation("${edcGroup}:control-plane-api:${edcVersion}")
     implementation("${edcGroup}:control-plane-api-client:${edcVersion}")
     implementation("${edcGroup}:api-observability:${edcVersion}")
-    implementation("${edcGroup}:data-plane-client:${edcVersion}")
-    implementation("${edcGroup}:data-plane-selector-client:${edcVersion}")
-    implementation("${edcGroup}:data-plane-selector-core:${edcVersion}")
-    implementation("${edcGroup}:data-plane-selector-api:${edcVersion}")
     implementation("${edcGroup}:configuration-filesystem:${edcVersion}")
+
+    implementation("${edcGroup}:auth-tokenbased:${edcVersion}")
+    implementation("${edcGroup}:management-api:${edcVersion}")
+    implementation("${edcGroup}:vault-hashicorp:${edcVersion}")
+    implementation("${edcGroup}:iam-mock:${edcVersion}")
+    implementation("${edcGroup}:dsp:${edcVersion}")
+    //file-transfer
+    implementation("${edcGroup}:data-plane-core:${edcVersion}")
+    implementation(project(":edc-ionos-nextcloud-extension:nextcloud-dataplane"))
     implementation("${edcGroup}:data-plane-client:${edcVersion}")
     implementation("${edcGroup}:data-plane-selector-client:${edcVersion}")
     implementation("${edcGroup}:data-plane-selector-core:${edcVersion}")
     implementation("${edcGroup}:transfer-data-plane:${edcVersion}")
     implementation("${edcGroup}:http:${edcVersion}")
 
-    implementation("${edcGroup}:dsp:${edcVersion}")
-
-    implementation("${edcGroup}:auth-tokenbased:${edcVersion}")
-
-    implementation("${edcGroup}:management-api:${edcVersion}")
-
-    implementation("${edcGroup}:vault-hashicorp:${edcVersion}")
-
-    implementation(project(":edc-ionos-nextcloud-extension:nextcloud-provision"))
-
-    implementation("${edcGroup}:iam-mock:${edcVersion}")
-
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
+
 application {
     mainClass.set("org.eclipse.edc.boot.system.runtime.BaseRuntime")
 }

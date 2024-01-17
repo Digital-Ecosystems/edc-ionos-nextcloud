@@ -1,28 +1,32 @@
 package com.ionos.edc.provision;
 
 import java.util.Objects;
+
+import com.ionos.edc.schema.NextcloudSchema;
+import org.eclipse.edc.connector.transfer.spi.types.DataRequest;
 import org.eclipse.edc.connector.transfer.spi.types.ResourceDefinition;
+import org.eclipse.edc.spi.types.domain.DataAddress;
+
 public class NextCloudResourceDefinition extends ResourceDefinition {
-    private String filePath;
-    private String fileName;
-    private String keyName;
+    private DataRequest dataRequest;
+    private DataAddress dataAddress;
+
+
     public NextCloudResourceDefinition() {
 
     }
 
-    public String getFilePath() {
-        return filePath;
+    public DataRequest getDataRequest() {
+        return dataRequest;
     }
 
-    public String getFileName() {
-        return fileName;
+    public DataAddress getDataAddress() {
+        return dataAddress;
     }
-    public String getKeyName() {
-        return keyName;
-    }
+
     @Override
     public Builder toBuilder() {
-        return initializeBuilder(new Builder()).filePath(filePath).fileName(fileName).keyName(keyName);
+        return initializeBuilder(new Builder()).DataRequest(dataRequest).DataAddress(dataAddress);
     }
     public static class Builder extends ResourceDefinition.Builder<NextCloudResourceDefinition, Builder> {
 
@@ -34,26 +38,24 @@ public class NextCloudResourceDefinition extends ResourceDefinition {
             return new Builder();
         }
 
-        public Builder keyName(String keyName) {
-            resourceDefinition.keyName = keyName;
+       public Builder DataRequest(DataRequest dataRequest) {
+            resourceDefinition.dataRequest = dataRequest;
             return this;
         }
 
-        public Builder filePath(String filePath) {
-            resourceDefinition.filePath = filePath;
+        public Builder DataAddress(DataAddress dataAddress) {
+            resourceDefinition.dataAddress = dataAddress;
             return this;
         }
-        public Builder fileName(String fileName) {
-            resourceDefinition.fileName = fileName;
-            return this;
-        }
-
-
         @Override
         protected void verify() {
             super.verify();
-            Objects.requireNonNull(resourceDefinition.getFilePath(), "file path is required");
-            Objects.requireNonNull(resourceDefinition.getFileName(), "file Name is required");
+            Objects.requireNonNull(resourceDefinition.dataAddress.getKeyName(), "file path is required");
+            Objects.requireNonNull(resourceDefinition.dataRequest.getAssetId(), "file Name is required");
+            Objects.requireNonNull(resourceDefinition.dataRequest.getDataDestination(), "Destination is required");
+            Objects.requireNonNull(resourceDefinition.dataRequest.getDataDestination().getStringProperty(NextcloudSchema.HTTP_RECEIVER), "Destination Http Receiver is required");
+            Objects.requireNonNull(resourceDefinition.dataRequest.getDataDestination().getStringProperty(NextcloudSchema.FILE_PATH), "Destination file path is required");
+            Objects.requireNonNull(resourceDefinition.dataRequest.getDataDestination().getStringProperty(NextcloudSchema.FILE_NAME), "Destination file name is required");
 
         }
     }

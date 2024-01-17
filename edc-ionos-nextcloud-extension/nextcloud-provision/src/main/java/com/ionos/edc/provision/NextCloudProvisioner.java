@@ -1,37 +1,55 @@
 package com.ionos.edc.provision;
 
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ionos.edc.http.HttpParts;
 import com.ionos.edc.nextcloudapi.NextCloudApi;
+import com.ionos.edc.schema.NextcloudSchema;
 import com.ionos.edc.token.NextCloudToken;
 import dev.failsafe.RetryPolicy;
+
 import org.eclipse.edc.connector.transfer.spi.provision.Provisioner;
-import org.eclipse.edc.connector.transfer.spi.types.DeprovisionedResource;
-import org.eclipse.edc.connector.transfer.spi.types.ProvisionResponse;
-import org.eclipse.edc.connector.transfer.spi.types.ProvisionedResource;
-import org.eclipse.edc.connector.transfer.spi.types.ResourceDefinition;
+import org.eclipse.edc.connector.transfer.spi.types.*;
 import org.eclipse.edc.policy.model.AtomicConstraint;
-import org.eclipse.edc.policy.model.Constraint;
-import org.eclipse.edc.policy.model.Expression;
 import org.eclipse.edc.policy.model.Policy;
 import org.eclipse.edc.spi.EdcException;
 import org.eclipse.edc.spi.monitor.Monitor;
+import org.eclipse.edc.spi.response.ResponseStatus;
 import org.eclipse.edc.spi.response.StatusResult;
+import org.eclipse.edc.spi.http.EdcHttpClient;
+
+
+import okhttp3.MediaType;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+
+
 
 import java.time.OffsetDateTime;
 import java.util.concurrent.CompletableFuture;
 
-import static dev.failsafe.Failsafe.with;
+
 
 public class NextCloudProvisioner  implements Provisioner<NextCloudResourceDefinition, NextCloudProvisionedResource> {
+    private static final MediaType JSON = MediaType.get("application/json");
     private  RetryPolicy<Object> retryPolicy;
     private  Monitor monitor;
 
     private NextCloudApi nextCloudApi;
 
+    private final EdcHttpClient httpClient;
+    private final ObjectMapper mapper;
 
-    public NextCloudProvisioner(RetryPolicy<Object> retryPolicy, Monitor monitor, NextCloudApi nextCloudApi) {
+    private String authKey;
+    private String endpoint = "/nextcloudtransfer";
+    public NextCloudProvisioner(RetryPolicy<Object> retryPolicy, Monitor monitor, NextCloudApi nextCloudApi,  EdcHttpClient httpClient, ObjectMapper mapper, String authKey) {
         this.retryPolicy = retryPolicy;
         this.monitor = monitor;
         this.nextCloudApi = nextCloudApi;
+        this.httpClient = httpClient;
+        this.mapper = mapper;
+        this.authKey= authKey;
     }
 
     @Override
@@ -46,9 +64,12 @@ public class NextCloudProvisioner  implements Provisioner<NextCloudResourceDefin
 
     @Override
     public CompletableFuture<StatusResult<ProvisionResponse>> provision(NextCloudResourceDefinition resourceDefinition, Policy policy) {
-        String fileName = resourceDefinition.getFileName();
-        String filePath = resourceDefinition.getFilePath();
-        String resourceName = resourceDefinition.getKeyName();
+        String fileNameDest = resourceDefinition.getDataRequest().getDataDestination().getStringProperty(NextcloudSchema.FILE_NAME);
+        String filePathDest = resourceDefinition.getDataRequest().getDataDestination().getStringProperty(NextcloudSchema.FILE_PATH);
+        String filePath = resourceDefinition.getDataAddress().getStringProperty(NextcloudSchema.FILE_PATH);
+        String fileName = resourceDefinition.getDataAddress().getStringProperty(NextcloudSchema.FILE_NAME);
+
+        String resourceName = resourceDefinition.getDataAddress().getKeyName();
 
         AtomicConstraint ct = (AtomicConstraint) policy.getProhibitions().get(0).getConstraints().get(0);
         if(policy.getProhibitions().size() ==0 ){
@@ -59,26 +80,49 @@ public class NextCloudProvisioner  implements Provisioner<NextCloudResourceDefin
                 var resourceBuilder = NextCloudProvisionedResource.Builder.newInstance()
                         .id(resourceDefinition.getId())
                         .resourceName(resourceName)
-                        .filePath(filePath)
-                        .fileName(fileName)
-                        .urlKey(filePath + fileName + resourceDefinition.getId())
+                        .filePath(filePathDest)
+                        .fileName(fileNameDest)
+                        .urlKey(filePathDest + fileNameDest + resourceDefinition.getId())
                         .resourceDefinitionId(resourceDefinition.getId())
                         .transferProcessId(resourceDefinition.getTransferProcessId())
                         .hasToken(true);
-                if (resourceDefinition.getFilePath() != null) {
-                    resourceBuilder = resourceBuilder.filePath(resourceDefinition.getFilePath());
-                }
-                if (resourceDefinition.getFileName() != null) {
-                    resourceBuilder = resourceBuilder.fileName(resourceDefinition.getFileName());
-                }
+
 
                 var resource = resourceBuilder.build();
-                var urlKey = nextCloudApi.generateUrlDownload("", fileName);
-                var expiryTime = OffsetDateTime.now().plusHours(1);
-                var urlToken = new NextCloudToken(urlKey,true ,expiryTime.toInstant().toEpochMilli());
-                var response = ProvisionResponse.Builder.newInstance().resource(resource).secretToken(urlToken).build();
+                try {
+                    var urlKey = nextCloudApi.generateUrlDownload(filePath, fileName);
+                    var expiryTime = OffsetDateTime.now().plusHours(1);
+                    var urlToken = new NextCloudToken(urlKey, true, expiryTime.toInstant().toEpochMilli());
 
-                return CompletableFuture.completedFuture(StatusResult.success(response));
+                    Request request;
+                    try {
+                        if(resourceDefinition.getDataRequest().getDataDestination().getStringProperty(NextcloudSchema.HTTP_RECEIVER) == null){
+                            throw new EdcException("No receiverHttpEndpoint available");
+                        }
+
+                        request = createRequest(resourceDefinition, urlToken,policy);
+                    } catch (JsonProcessingException e) {
+                        monitor.severe("Error serializing: ", e);
+                        return CompletableFuture.completedFuture(StatusResult.failure(ResponseStatus.FATAL_ERROR, "Fatal error serializing request: " + e.getMessage()));
+                    }
+
+                    try (var response = httpClient.execute(request)) {
+
+                        if (response.isSuccessful()) {
+                            return CompletableFuture.completedFuture(StatusResult.success(ProvisionResponse.Builder.newInstance().inProcess(true).build()));
+                        } else if (response.code() >= 500 && response.code() <= 504) {
+                            // retry
+                            return CompletableFuture.completedFuture(StatusResult.failure(ResponseStatus.ERROR_RETRY, "HttpProviderProvisioner: received error code: " + response.code()));
+                        } else {
+                            // fatal error
+                            return CompletableFuture.completedFuture(StatusResult.failure(ResponseStatus.FATAL_ERROR, "HttpProviderProvisioner: received fatal error code: " + response.code()));
+                        }
+                    }
+
+                }catch (Exception e){
+                    monitor.severe("Error provisioning", e);
+                    return CompletableFuture.completedFuture(StatusResult.failure(ResponseStatus.FATAL_ERROR,e.getMessage()));
+                }
             }else {
             var resourceBuilder = NextCloudProvisionedResource.Builder.newInstance()
                     .id(resourceDefinition.getId())
@@ -88,20 +132,20 @@ public class NextCloudProvisioner  implements Provisioner<NextCloudResourceDefin
                     .urlKey(filePath + fileName + resourceDefinition.getId())
                     .resourceDefinitionId(resourceDefinition.getId())
                     .transferProcessId(resourceDefinition.getTransferProcessId())
+
                     .hasToken(true);
-            if (resourceDefinition.getFilePath() != null) {
-                resourceBuilder = resourceBuilder.filePath(resourceDefinition.getFilePath());
-            }
-            if (resourceDefinition.getFileName() != null) {
-                resourceBuilder = resourceBuilder.fileName(resourceDefinition.getFileName());
-            }
+
             var resource = resourceBuilder.build();
             var expiryTime = OffsetDateTime.now().plusHours(1);
             var urlToken = new NextCloudToken("",false ,expiryTime.toInstant().toEpochMilli());
 
             var response = ProvisionResponse.Builder.newInstance().resource(resource).secretToken(urlToken).build();
-
+            try{
             nextCloudApi.fileShare(filePath,fileName,"user1","0");
+            }catch (Exception e){
+                monitor.severe("Error sharing file");
+                return CompletableFuture.completedFuture(StatusResult.failure(ResponseStatus.FATAL_ERROR,e.getMessage()));
+            }
             return CompletableFuture.completedFuture(StatusResult.success(response));
 
         }
@@ -111,6 +155,29 @@ public class NextCloudProvisioner  implements Provisioner<NextCloudResourceDefin
     public CompletableFuture<StatusResult<DeprovisionedResource>> deprovision(NextCloudProvisionedResource provisionedResource, Policy policy) {
       return CompletableFuture.completedFuture(StatusResult.success(DeprovisionedResource.Builder.newInstance().provisionedResourceId(provisionedResource.getId()).build()));
     }
+
+
+
+    private Request createRequest(NextCloudResourceDefinition resourceDefinition, NextCloudToken url, Policy policy) throws JsonProcessingException {
+        var provisionerRequest = HttpParts.Builder.newInstance()
+                .dataAddress(resourceDefinition.getDataAddress())
+                .dataRequest(resourceDefinition.getDataRequest())
+                .assetId(resourceDefinition.getDataRequest().getAssetId())
+                .transferProcessId(resourceDefinition.getTransferProcessId())
+                .resourceDefinitionId(resourceDefinition.getId())
+                .policy(policy)
+                .url(url)
+                .build();
+        var requestBody = RequestBody.create(mapper.writeValueAsString(provisionerRequest), JSON);
+        return new Request.Builder()
+                .addHeader("X-API-Key", "%s".formatted(authKey))
+                .url(resourceDefinition
+                        .getDataRequest()
+                        .getDataDestination()
+                        .getStringProperty(NextcloudSchema.HTTP_RECEIVER)+endpoint)
+                .post(requestBody).build();
+    }
+
 
 
 }
