@@ -17,18 +17,11 @@ public class NextCloudConsumerResourceDefinitionGenerator  implements ConsumerRe
         Objects.requireNonNull(dataRequest, "dataRequest must always be provided");
         Objects.requireNonNull(policy, "policy must always be provided");
 
-        var destination = dataRequest.getDataDestination();
         var id = randomUUID().toString();
-        var keyName = destination.getKeyName();
-        var filePath = destination.getStringProperty(NextcloudSchema.FILE_PATH);
-        var fileName = destination.getStringProperty(NextcloudSchema.FILE_NAME);
-
 
         return  NextCloudResourceDefinition.Builder.newInstance()
                 .id(id)
-                .keyName(keyName)
-                .filePath(filePath)
-                .fileName(fileName)
+                .DataAddress(dataRequest.getDataDestination())
                 .build();
     }
 

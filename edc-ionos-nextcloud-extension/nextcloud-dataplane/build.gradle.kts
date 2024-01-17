@@ -23,7 +23,12 @@ dependencies {
     implementation("${edcGroup}:transfer-spi:${edcVersion}")
     implementation("${edcGroup}:data-plane-util:${edcVersion}")
     implementation("${edcGroup}:data-plane-core:${edcVersion}")
+    implementation("${edcGroup}:http-spi:${edcVersion}")
+    implementation("${edcGroup}:control-api-configuration:${edcVersion}")
+    implementation("${edcGroup}:management-api-configuration:${edcVersion}")
+    implementation("io.swagger.core.v3:swagger-annotations:2.2.20")
 
+    //implementation(libs.jakarta.rsApi)
 
     implementation(project(":edc-ionos-nextcloud-extension:nextcloud-core"))
     implementation("com.google.code.gson:gson:2.8.6")

@@ -20,11 +20,20 @@ repositories {
 dependencies {
 
     implementation("${edcGroup}:transfer-spi:${edcVersion}")
+    implementation("${edcGroup}:core-spi:${edcVersion}")
+    implementation("${edcGroup}:http-spi:${edcVersion}")
+    implementation("${edcGroup}:web-spi:${edcVersion}")
+
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("dev.failsafe:failsafe:3.2.4")
 
     implementation(project(":edc-ionos-nextcloud-extension:nextcloud-core"))
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+    implementation("com.google.code.gson:gson:2.8.6")
+    implementation("io.swagger.core.v3:swagger-annotations:2.2.20")
+    implementation("com.apicatalog:titanium-json-ld:1.3.3")
+    testImplementation("${edcGroup}:json-ld:${edcVersion}")
 }
 
 tasks.test {
