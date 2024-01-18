@@ -61,9 +61,10 @@ public class DataPlaneNextcloud  implements ServiceExtension {
         var sinkFactory = new NextCloudDataSinkFactory(executorContainer.getExecutorService(), monitor, vault,
                 typeManager, nextCloudApi);
 
-        NextCloudHTTPApiController nextApi =  new NextCloudHTTPApiController(nextCloudApi,executorContainer.getExecutorService(), monitor);
-        webService.registerResource(managementApiConfig.getContextAlias(),nextApi);
+
         pipelineService.registerFactory(sinkFactory);
+        NextCloudHTTPApiController nextApi =  new NextCloudHTTPApiController(nextCloudApi,executorContainer.getExecutorService(), monitor,pipelineService, typeManager, vault);
+        webService.registerResource(managementApiConfig.getContextAlias(),nextApi);
         context.getMonitor().info(NAME+ " Extension initialized!");
     }
 }
