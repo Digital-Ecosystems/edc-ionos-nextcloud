@@ -90,9 +90,12 @@ public class NextCloudProvisioner  implements Provisioner<NextCloudResourceDefin
 
                 var resource = resourceBuilder.build();
                 try {
-                    var urlKey = nextCloudApi.generateUrlDownload(filePath, fileName);
-                    var expiryTime = OffsetDateTime.now().plusHours(1);
-                    var urlToken = new NextCloudToken(urlKey, true, expiryTime.toInstant().toEpochMilli());
+                    var urlKey ="";
+                    if (resourceDefinition.getDataAddress().getType().equals(NextcloudSchema.TYPE)) {
+                         urlKey = nextCloudApi.generateUrlDownload(filePath, fileName);
+                    }
+                        var expiryTime = OffsetDateTime.now().plusHours(1);
+                        var urlToken = new NextCloudToken(urlKey, true, expiryTime.toInstant().toEpochMilli());
 
                     Request request;
                     try {
