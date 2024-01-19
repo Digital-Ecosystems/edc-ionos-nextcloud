@@ -9,9 +9,18 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import org.eclipse.edc.connector.dataplane.spi.pipeline.PipelineService;
+import org.eclipse.edc.connector.dataplane.spi.resolver.DataAddressResolver;
+import org.eclipse.edc.spi.security.Vault;
+import org.eclipse.edc.spi.types.TypeManager;
+import org.eclipse.edc.spi.types.domain.DataAddress;
 import org.eclipse.edc.spi.monitor.Monitor;
+import org.eclipse.edc.spi.types.domain.transfer.DataFlowRequest;
 
 import java.util.concurrent.ExecutorService;
+
+import static org.eclipse.edc.spi.types.domain.DataAddress.EDC_DATA_ADDRESS_SECRET;
+
 @Consumes({ MediaType.APPLICATION_JSON })
 @Produces({ MediaType.APPLICATION_JSON })
 @Path(NextCloudHTTPApiController.PATH)
@@ -20,30 +29,35 @@ public class NextCloudHTTPApiController implements NextCloudHTTPApi{
     private NextCloudApi nextCloudApi;
     private final ExecutorService executorService;
     private Monitor monitor;
-    public NextCloudHTTPApiController(NextCloudApi nextCloudApi, ExecutorService executorService, Monitor monitor) {
+
+    private final PipelineService pipelineService;
+    private final Vault vault;
+    private TypeManager typeManager;
+
+    public NextCloudHTTPApiController(NextCloudApi nextCloudApi, ExecutorService executorService, Monitor monitor, PipelineService pipelineService, TypeManager typeManager, Vault vault) {
         this.nextCloudApi = nextCloudApi;
         this.executorService = executorService;
         this.monitor = monitor;
+        this.pipelineService = pipelineService;
+        this.typeManager = typeManager;
+        this.vault = vault;
+
     }
 
     @POST
     @Override
     public void startTransferProcess(@RequestBody HttpParts httpParts) {
-        var dataSource = NextCloudHTTPDataSource.Builder.newInstance()
-                .client(nextCloudApi)
-                .filePath(httpParts.getDataAddress().getStringProperty(NextcloudSchema.FILE_PATH))
-                .fileName(httpParts.getDataAddress().getStringProperty(NextcloudSchema.FILE_NAME))
-                .downloadable(true)
-                .url(httpParts.getUrl().getUrlToken())
-                .build();
-        var dataSink=  NextCloudHTTPDataSink.Builder.newInstance()
-                .filePath(httpParts.getDataRequest().getDataDestination().getStringProperty(NextcloudSchema.FILE_PATH))
-                .fileName(httpParts.getDataRequest().getDataDestination().getStringProperty(NextcloudSchema.FILE_NAME))
-                .downloadable(true)
-                .requestId(httpParts.getDataRequest().getId()).executorService(executorService)
-                .monitor(monitor).nextCloudApi(nextCloudApi).build();
+        var secret = httpParts.getUrl();
+        vault.storeSecret(httpParts.getDataRequest().getDataDestination().getKeyName(), typeManager.writeValueAsString(secret));
 
-            dataSink.transferParts(dataSource.openPartStreamPart().toList());
+       var dataflow=  DataFlowRequest.Builder.newInstance().processId(httpParts.getDataRequest().getProcessId())
+                .sourceDataAddress(httpParts.getDataAddress())
+                .destinationDataAddress(httpParts.getDataRequest().getDataDestination())
+                .build();
+
+
+        pipelineService.transfer(dataflow);
+
 
 
 

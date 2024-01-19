@@ -90,9 +90,12 @@ public class NextCloudProvisioner  implements Provisioner<NextCloudResourceDefin
 
                 var resource = resourceBuilder.build();
                 try {
-                    var urlKey = nextCloudApi.generateUrlDownload(filePath, fileName);
-                    var expiryTime = OffsetDateTime.now().plusHours(1);
-                    var urlToken = new NextCloudToken(urlKey, true, expiryTime.toInstant().toEpochMilli());
+                    var urlKey ="";
+                    if (resourceDefinition.getDataAddress().getType().equals(NextcloudSchema.TYPE)) {
+                         urlKey = nextCloudApi.generateUrlDownload(filePath, fileName);
+                    }
+                        var expiryTime = OffsetDateTime.now().plusHours(1);
+                        var urlToken = new NextCloudToken(urlKey, true, expiryTime.toInstant().toEpochMilli());
 
                     Request request;
                     try {
@@ -139,7 +142,7 @@ public class NextCloudProvisioner  implements Provisioner<NextCloudResourceDefin
             var expiryTime = OffsetDateTime.now().plusHours(1);
             var urlToken = new NextCloudToken("",false ,expiryTime.toInstant().toEpochMilli());
 
-            var response = ProvisionResponse.Builder.newInstance().resource(resource).secretToken(urlToken).build();
+            var response = ProvisionResponse.Builder.newInstance().resource(resource).inProcess(true).secretToken(urlToken).build();
             try{
             nextCloudApi.fileShare(filePath,fileName,"user1","0");
             }catch (Exception e){
