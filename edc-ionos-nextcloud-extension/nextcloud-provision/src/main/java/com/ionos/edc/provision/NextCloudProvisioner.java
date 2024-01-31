@@ -9,7 +9,6 @@ import com.ionos.edc.schema.NextcloudSchema;
 import com.ionos.edc.token.NextCloudToken;
 import dev.failsafe.RetryPolicy;
 
-import org.eclipse.edc.connector.contract.spi.offer.store.ContractDefinitionStore;
 import org.eclipse.edc.connector.transfer.spi.provision.Provisioner;
 import org.eclipse.edc.connector.transfer.spi.types.*;
 import org.eclipse.edc.policy.model.AtomicConstraint;
@@ -31,14 +30,16 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-
+import static org.eclipse.edc.spi.CoreConstants.EDC_NAMESPACE;
 
 
 public class NextCloudProvisioner  implements Provisioner<NextCloudResourceDefinition, NextCloudProvisionedResource> {
     private static final MediaType JSON = MediaType.get("application/json");
-    private static final String TAG = "http://www.w3.org/ns/odrl/2/assignee";
     private RetryPolicy<Object> retryPolicy;
     private Monitor monitor;
 
@@ -80,11 +81,12 @@ public class NextCloudProvisioner  implements Provisioner<NextCloudResourceDefin
 
         String resourceName = resourceDefinition.getDataAddress().getKeyName();
 
-        AtomicConstraint ct = (AtomicConstraint) policy.getProhibitions().get(0).getConstraints().get(0);
-        if (policy.getProhibitions().size() == 0) {
-            throw new EdcException("No Prohibition available");
+        if( policy.getExtensibleProperties().isEmpty()){
+            return CompletableFuture.completedFuture(StatusResult.failure(ResponseStatus.FATAL_ERROR, "Extensible properties is mandatory"));
         }
-        if (Boolean.parseBoolean(ct.getRightExpression().toString().replace("'", ""))) {
+
+
+        if (Boolean.parseBoolean(  getProperties(policy,EDC_NAMESPACE+"downloadable"))) {
 
             var resourceBuilder = NextCloudProvisionedResource.Builder.newInstance()
                     .id(resourceDefinition.getId())
@@ -156,24 +158,12 @@ public class NextCloudProvisioner  implements Provisioner<NextCloudResourceDefin
 
 
 
-                if (policy.getObligations().size() == 0 ) {
-                    throw new EdcException("Expiration time not available");
-                }
-                if (policy.getProhibitions().size() == 0) {
-                    throw new EdcException("Prohibition not available");
-                }
-                if(policy.getPermissions().size() == 0){
-                    throw new EdcException("Permission not available");
-                }
-
-
-
                 nextCloudApi.fileShare(filePath,
                         fileName,
-                        getAtomicConstraint(policy.getPermissions().get(0).getConstraints(),"shareWith"),
-                        getAtomicConstraint(policy.getPermissions().get(0).getConstraints(),"shareType"),
-                        getAtomicConstraint(policy.getObligations().get(0).getConstraints(),"permissionType"),
-                        nowDate(Integer.parseInt(getAtomicConstraint(policy.getObligations().get(0).getConstraints(),"expirationTime"))));
+                        getProperties(policy,EDC_NAMESPACE+"shareWith"),
+                        getProperties(policy,EDC_NAMESPACE+"shareType"),
+                        getProperties(policy,EDC_NAMESPACE+"permissionType"),
+                        nowDate(Integer.parseInt(getProperties(policy,EDC_NAMESPACE+"expirationTime"))));
             } catch (Exception e) {
                 monitor.severe("Error sharing file, cause: ", e);
                 return CompletableFuture.completedFuture(StatusResult.failure(ResponseStatus.FATAL_ERROR, e.getMessage()));
@@ -212,20 +202,26 @@ public class NextCloudProvisioner  implements Provisioner<NextCloudResourceDefin
 
     private String nowDate(int plusDays) {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime twoHoursLater = now.plusDays(plusDays);
+        LocalDateTime daysLater = now.plusDays(plusDays);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String formattedDate = twoHoursLater.format(formatter);
+        String formattedDate = daysLater.format(formatter);
+
         return formattedDate;
     }
 
-    private String getAtomicConstraint(List<Constraint> ct, String tag) {
-        for(int i=0; i<ct.size(); i++){
-            AtomicConstraint ctToValidate = (AtomicConstraint)  ct.get(i);
-            if(ctToValidate.getLeftExpression().toString().replace("'", "").equals(tag)){
-                return ctToValidate.getRightExpression().toString().replace("'", "");
-            }
-        }
-        return "";
-        }
+    private String getProperties(Policy policy, String tag ){
+        LinkedHashMap   policyMap = (LinkedHashMap) policy.getExtensibleProperties().values().stream().toList().get(0);
+
+        ArrayList<Object> firstArrayList = (ArrayList<Object> ) policyMap.get(tag);
+
+        // Access the first LinkedHashMap in the ArrayList
+        LinkedHashMap<String, Object> firstLinkedHashMap = (LinkedHashMap<String, Object>) firstArrayList.get(0);
+
+        // Get the value of the "@value" key
+        Object value = firstLinkedHashMap.get("@value");
+        return value.toString();
+    }
+
+
 
 }

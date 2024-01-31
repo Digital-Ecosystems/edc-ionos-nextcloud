@@ -166,6 +166,7 @@ public class NextCloudImpl implements NextCloudApi {
             Document document = Jsoup.parse(xmlResponse);
             String OC_FILEID = "oc|fileid";
             String fileId = document.select(OC_FILEID).text();
+
             return fileId;
         } catch (IOException e) {
             throw new EdcException("Error fetching id from file: "+e);

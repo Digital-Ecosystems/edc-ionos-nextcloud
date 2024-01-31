@@ -13,7 +13,7 @@ import org.eclipse.edc.spi.security.Vault;
 import org.eclipse.edc.spi.system.ServiceExtension;
 import org.eclipse.edc.spi.system.ServiceExtensionContext;
 import org.eclipse.edc.spi.types.TypeManager;
-import org.eclipse.edc.connector.contract.spi.offer.store.ContractDefinitionStore;
+
 
 @Extension(value = ProvisionNextCloud.NAME)
 public class ProvisionNextCloud implements ServiceExtension {
