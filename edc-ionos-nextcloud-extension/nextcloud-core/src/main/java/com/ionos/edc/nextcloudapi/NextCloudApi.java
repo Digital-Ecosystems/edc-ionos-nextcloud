@@ -12,5 +12,5 @@ public interface NextCloudApi {
 
     void uploadFile(String filePath, String fileName, ByteArrayInputStream part);
 
-    void fileShare(String filePath, String fileName,String user, String permissionType);
+    void fileShare(String filePath, String fileName, String shareWith, String shareType, String permissionType, String expireDate);
 }

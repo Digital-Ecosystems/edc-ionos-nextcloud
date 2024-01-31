@@ -114,11 +114,11 @@ public class NextCloudImpl implements NextCloudApi {
     }
 
     @Override
-    public void fileShare(String filePath, String fileName, String user, String permissionType) {
+    public void fileShare(String filePath, String fileName, String shareWith, String shareType, String permissionType, String expireDate) {
 
         String FILESHARE_ADDRESS = "/ocs/v2.php/apps/files_sharing/api/v1/shares?";
         String url = basicUrl + FILESHARE_ADDRESS +
-                "path=" +filePath +"/"+ fileName + "&shareType=0&shareWith=" + user + "&publicUpload=false&permissions=" + permissionType;
+                "path=" +filePath +"/"+ fileName + "&shareType="+shareType+"&shareWith=" + shareWith  +"&publicUpload=false&permissions=" + permissionType + "&expireDate=" + expireDate;
 
 
         HttpUrl urlHttp = HttpUrl.parse(url);
