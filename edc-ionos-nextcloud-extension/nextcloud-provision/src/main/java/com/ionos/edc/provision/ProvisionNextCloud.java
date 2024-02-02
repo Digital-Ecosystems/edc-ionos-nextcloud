@@ -13,6 +13,8 @@ import org.eclipse.edc.spi.security.Vault;
 import org.eclipse.edc.spi.system.ServiceExtension;
 import org.eclipse.edc.spi.system.ServiceExtensionContext;
 import org.eclipse.edc.spi.types.TypeManager;
+
+
 @Extension(value = ProvisionNextCloud.NAME)
 public class ProvisionNextCloud implements ServiceExtension {
 
@@ -28,9 +30,10 @@ public class ProvisionNextCloud implements ServiceExtension {
     @Inject
     private NextCloudApi nextCloudApi;
 
-
     @Inject
     private EdcHttpClient httpClient;
+
+
     @Setting
     private static final String HTTP_RECEIVER_AUTH_KEY = "edc.api.auth.key";
 
@@ -48,7 +51,7 @@ public class ProvisionNextCloud implements ServiceExtension {
         var retryPolicy = (RetryPolicy<Object>) context.getService(RetryPolicy.class);
         monitor.debug("NextCloudProvisionExtension");
         var authKey = context.getSetting(HTTP_RECEIVER_AUTH_KEY, null);
-        var nextCloudProvisioner = new NextCloudProvisioner(retryPolicy, monitor, nextCloudApi, httpClient,typeManager.getMapper(),authKey );
+        var nextCloudProvisioner = new NextCloudProvisioner(retryPolicy, monitor, nextCloudApi, httpClient,typeManager.getMapper(), authKey);
 
         provisionManager.register(nextCloudProvisioner);
 

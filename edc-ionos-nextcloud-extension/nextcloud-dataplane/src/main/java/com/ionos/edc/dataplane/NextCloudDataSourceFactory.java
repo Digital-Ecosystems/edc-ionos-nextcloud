@@ -81,5 +81,5 @@ public class NextCloudDataSourceFactory  implements DataSourceFactory {
 
     }
 
-    }
+}
 

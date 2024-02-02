@@ -20,7 +20,7 @@ java -Dedc.fs.config=resources/config.properties -jar build/libs/dataspace-conne
 
 ## Based on the following
 
-- [https://github.com/eclipse-dataspaceconnector/DataSpaceConnector](https://github.com/eclipse-dataspaceconnector/DataSpaceConnector) - v0.1.2;
+- [https://github.com/eclipse-dataspaceconnector/DataSpaceConnector](https://github.com/eclipse-dataspaceconnector/DataSpaceConnector) - v0.4.1;
 - [International Data Spaces](https://www.internationaldataspaces.org);
 - [GAIA-X](https://gaia-x.eu) project;
 
@@ -37,12 +37,13 @@ You will need the following:
 ## Folders Description
 
 ### `connector`
-[TBD]
+../../connector
 
 ### `nextcloud-extension`
 Contains the source code of the Nextcloud Extension.
 
 ### `example`
+- [Repository with examples of how to use the Nextcloud Extension.](https://github.com/Digital-Ecosystems/edc-ionos-sample) 
 - Contains an example with a file transfer process between two Nextcloud.
 - Contains an example with a file sharing process in one Nextcloud with different users.
 - Contains an example with a file transfer process between one Nextcloud and one Ionos S3 bucket.
@@ -92,8 +93,8 @@ It is required to configure those parameters:
 ## Building and Running
 
 ```bash
-git clone [TBD]
-cd EDC-IONOS-Extension
+git clone https://github.com/Digital-Ecosystems/edc-ionos-nextcloud.git
+cd edc-ionos-nextcloud
 ./gradlew clean build
 ```
 
@@ -103,4 +104,4 @@ java -Dedc.fs.config=resources/config.properties -jar build/libs/dataspace-conne
 ```
 
 ## Example
-In order to see a working example, go to the example folder.
+In order to see a working example, go to the example repository.
