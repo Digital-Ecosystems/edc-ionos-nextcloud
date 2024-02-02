@@ -1,26 +1,26 @@
 package com.ionos.edc.dataplane;
+
 import com.ionos.edc.nextcloudapi.NextCloudApi;
 import org.eclipse.edc.connector.dataplane.spi.pipeline.DataSource;
 import org.eclipse.edc.connector.dataplane.spi.pipeline.StreamResult;
 import org.eclipse.edc.connector.dataplane.util.sink.ParallelSink;
-import org.eclipse.edc.spi.response.ResponseStatus;
 import org.jetbrains.annotations.NotNull;
-
 import java.io.ByteArrayInputStream;
 import java.util.List;
-
 import static java.lang.String.format;
-public class NextCloudDataSink extends ParallelSink {
 
+public class NextCloudDataSink extends ParallelSink {
     private NextCloudApi nextCloudApi;
     private String filePath;
     private String fileName;
     private Boolean downloadable;
+
     public NextCloudDataSink() {
     }
 
     @Override
     protected StreamResult<Object> transferParts(List<DataSource.Part> parts) {
+
         if(downloadable) {
             for (var part : parts) {
                 try (var input = part.openStream()) {
@@ -33,6 +33,7 @@ public class NextCloudDataSink extends ParallelSink {
         }
         return StreamResult.success(new ByteArrayInputStream("".getBytes()));
     }
+
     @NotNull
     private StreamResult<Object> uploadFailure(Exception e, String fileName) {
         var message = format("Error writing the %s object on the nextcloud", fileName, e.getMessage());
@@ -59,10 +60,12 @@ public class NextCloudDataSink extends ParallelSink {
             sink.filePath = filePath;
             return this;
         }
+
         public Builder fileName(String fileName) {
             sink.fileName = fileName;
             return this;
         }
+        
         public Builder downloadable(Boolean downloadable) {
             sink.downloadable = downloadable;
             return this;

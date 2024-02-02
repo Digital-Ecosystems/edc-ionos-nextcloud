@@ -1,13 +1,11 @@
 package com.ionos.edc.dataplane;
+
 import com.ionos.edc.dataplane.validation.NextCloudDataAddressValidator;
 import com.ionos.edc.nextcloudapi.NextCloudApi;
-import com.ionos.edc.nextcloudapi.NextCloudImpl;
 import com.ionos.edc.schema.NextcloudSchema;
 import com.ionos.edc.token.NextCloudToken;
-import dev.failsafe.RetryPolicy;
 import org.eclipse.edc.connector.dataplane.spi.pipeline.DataSink;
 import org.eclipse.edc.connector.dataplane.spi.pipeline.DataSinkFactory;
-import org.eclipse.edc.policy.model.Policy;
 import org.eclipse.edc.spi.types.domain.DataAddress;
 import org.eclipse.edc.validator.spi.Validator;
 import org.eclipse.edc.spi.EdcException;
@@ -17,7 +15,6 @@ import org.eclipse.edc.spi.security.Vault;
 import org.eclipse.edc.spi.types.TypeManager;
 import org.eclipse.edc.spi.types.domain.transfer.DataFlowRequest;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.concurrent.ExecutorService;
 
 public class NextCloudDataSinkFactory  implements DataSinkFactory {
@@ -27,9 +24,7 @@ public class NextCloudDataSinkFactory  implements DataSinkFactory {
     private final Monitor monitor;
     private Vault vault;
     private TypeManager typeManager;
-
     private NextCloudApi nextCloudApi;
-
 
     public NextCloudDataSinkFactory(@NotNull ExecutorService executorService, Monitor monitor, Vault vault, TypeManager typeManager, NextCloudApi nextCloudApi) {
         this.executorService = executorService;
@@ -41,13 +36,13 @@ public class NextCloudDataSinkFactory  implements DataSinkFactory {
 
     @Override
     public boolean canHandle(DataFlowRequest request) {
+        
         return NextcloudSchema.TYPE.equals(request.getDestinationDataAddress().getType());
     }
 
     @Override
     public @NotNull Result<Void> validateRequest(DataFlowRequest request) {
         var destination = request.getDestinationDataAddress();
-
 
         return validation.validate(destination).toResult();
     }

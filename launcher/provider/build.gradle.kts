@@ -20,20 +20,15 @@ dependencies{
     implementation("${edcGroup}:data-plane-selector-core:${edcVersion}")
     implementation("${edcGroup}:data-plane-selector-api:${edcVersion}")
     implementation("${edcGroup}:configuration-filesystem:${edcVersion}")
-
-
     implementation("${edcGroup}:transfer-data-plane:${edcVersion}")
     implementation("${edcGroup}:http:${edcVersion}")
-
     implementation("${edcGroup}:dsp:${edcVersion}")
-
     implementation("${edcGroup}:auth-tokenbased:${edcVersion}")
-
     implementation("${edcGroup}:management-api:${edcVersion}")
-
     implementation("${edcGroup}:vault-hashicorp:${edcVersion}")
-    implementation(project(":edc-ionos-nextcloud-extension:nextcloud-provision"))
     implementation("${edcGroup}:iam-mock:${edcVersion}")
+
+    implementation(project(":edc-ionos-nextcloud-extension:nextcloud-provision"))
 
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")

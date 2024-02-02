@@ -26,14 +26,10 @@ public class ProvisionNextCloud implements ServiceExtension {
     private Monitor monitor;
     @Inject
     private TypeManager typeManager;
-
     @Inject
     private NextCloudApi nextCloudApi;
-
     @Inject
     private EdcHttpClient httpClient;
-
-
     @Setting
     private static final String HTTP_RECEIVER_AUTH_KEY = "edc.api.auth.key";
 
@@ -41,6 +37,7 @@ public class ProvisionNextCloud implements ServiceExtension {
     public String name() {
         return NAME;
     }
+    
     @Override
     public void initialize(ServiceExtensionContext context) {
         // TODO Auto-generated method stub

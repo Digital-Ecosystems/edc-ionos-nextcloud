@@ -2,12 +2,9 @@ package com.ionos.edc.dataplane;
 
 import com.ionos.edc.dataplane.http.NextCloudHTTPApiController;
 import com.ionos.edc.nextcloudapi.NextCloudApi;
-
-
 import org.eclipse.edc.connector.api.management.configuration.ManagementApiConfiguration;
 import org.eclipse.edc.connector.dataplane.spi.pipeline.DataTransferExecutorServiceContainer;
 import org.eclipse.edc.connector.dataplane.spi.pipeline.PipelineService;
-
 import org.eclipse.edc.runtime.metamodel.annotation.Extension;
 import org.eclipse.edc.runtime.metamodel.annotation.Inject;
 import org.eclipse.edc.spi.security.Vault;
@@ -16,8 +13,6 @@ import org.eclipse.edc.spi.system.ServiceExtensionContext;
 import org.eclipse.edc.spi.types.TypeManager;
 import org.eclipse.edc.spi.http.EdcHttpClient;
 import org.eclipse.edc.web.spi.WebService;
-
-import java.net.Authenticator;
 
 @Extension(value = DataPlaneNextcloud.NAME)
 public class DataPlaneNextcloud  implements ServiceExtension {
@@ -29,21 +24,16 @@ public class DataPlaneNextcloud  implements ServiceExtension {
     private ManagementApiConfiguration managementApiConfig;
     @Inject
     private PipelineService pipelineService;
-
     @Inject
     private DataTransferExecutorServiceContainer executorContainer;
-
     @Inject
     private Vault vault;
-
     @Inject
     private TypeManager typeManager;
     @Inject
     private NextCloudApi nextCloudApi;
     @Inject
     private EdcHttpClient httpClient;
-
-
 
     @Override
     public String name() {

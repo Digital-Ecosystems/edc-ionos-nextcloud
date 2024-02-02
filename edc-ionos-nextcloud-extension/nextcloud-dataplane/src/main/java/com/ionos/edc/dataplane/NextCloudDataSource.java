@@ -3,15 +3,11 @@ package com.ionos.edc.dataplane;
 import com.ionos.edc.nextcloudapi.NextCloudApi;
 import org.eclipse.edc.connector.dataplane.spi.pipeline.DataSource;
 import org.eclipse.edc.connector.dataplane.spi.pipeline.StreamResult;
-
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.Objects;
 import java.util.stream.Stream;
-
-import static org.eclipse.edc.connector.dataplane.spi.pipeline.StreamResult.error;
 import static org.eclipse.edc.connector.dataplane.spi.pipeline.StreamResult.success;
+
 public class NextCloudDataSource implements DataSource {
     private String fileName;
     private String filePath;
@@ -59,13 +55,10 @@ public class NextCloudDataSource implements DataSource {
                 return new ByteArrayInputStream("".getBytes());
             }
         }
-
-
     }
     public static class Builder {
         private final NextCloudDataSource source;
         public Builder fileName;
-
 
         private Builder() {
             source = new NextCloudDataSource();
@@ -79,18 +72,22 @@ public class NextCloudDataSource implements DataSource {
             source.fileName = fileName;
             return this;
         }
+
         public Builder filePath(String filePath) {
             source.filePath = filePath;
             return this;
         }
+
         public Builder url(String url) {
             source.url = url;
             return this;
         }
+
         public Builder downloadable(Boolean downloadable) {
             source.downloadable = downloadable;
             return this;
         }
+
         public Builder client(NextCloudApi nextCloudApi) {
             source.nextCloudApi = nextCloudApi;
             return this;
@@ -99,7 +96,6 @@ public class NextCloudDataSource implements DataSource {
         public NextCloudDataSource build() {
             return source;
         }
-
     }
 
 

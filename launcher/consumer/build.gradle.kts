@@ -25,6 +25,7 @@ dependencies {
     implementation("${edcGroup}:vault-hashicorp:${edcVersion}")
     implementation("${edcGroup}:iam-mock:${edcVersion}")
     implementation("${edcGroup}:dsp:${edcVersion}")
+    
     //file-transfer
     implementation("${edcGroup}:data-plane-core:${edcVersion}")
     implementation(project(":edc-ionos-nextcloud-extension:nextcloud-dataplane"))
