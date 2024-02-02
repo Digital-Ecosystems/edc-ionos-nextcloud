@@ -105,10 +105,6 @@ public class HttpParts {
             return this;
         }
 
-        public Builder type(Type type) {
-            request.type = type;
-            return this;
-        }
 
         public Builder resourceDefinitionId(String resourceDefinitionId) {
             request.resourceDefinitionId = resourceDefinitionId;
