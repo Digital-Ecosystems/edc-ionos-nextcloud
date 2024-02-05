@@ -18,6 +18,7 @@ repositories {
 }
 
 dependencies {
+
     implementation("${edcGroup}:data-plane-spi:${edcVersion}")
     implementation("${edcGroup}:util:${edcVersion}")
     implementation("${edcGroup}:transfer-spi:${edcVersion}")
@@ -27,10 +28,10 @@ dependencies {
     implementation("${edcGroup}:control-api-configuration:${edcVersion}")
     implementation("${edcGroup}:management-api-configuration:${edcVersion}")
     implementation("io.swagger.core.v3:swagger-annotations:2.2.20")
-
+    implementation("com.google.code.gson:gson:2.8.6")
 
     implementation(project(":edc-ionos-nextcloud-extension:nextcloud-core"))
-    implementation("com.google.code.gson:gson:2.8.6")
+
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
@@ -38,7 +39,6 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
 }
-
 
 publishing {
     publications {

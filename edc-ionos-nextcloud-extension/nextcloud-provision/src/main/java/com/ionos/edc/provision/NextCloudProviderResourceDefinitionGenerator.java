@@ -7,19 +7,17 @@ import org.eclipse.edc.connector.transfer.spi.types.ResourceDefinition;
 import org.eclipse.edc.policy.model.Policy;
 import org.eclipse.edc.spi.types.domain.DataAddress;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.Objects;
-
 import static java.util.UUID.randomUUID;
 
 public class NextCloudProviderResourceDefinitionGenerator implements ProviderResourceDefinitionGenerator {
+
     @Override
     public @Nullable ResourceDefinition generate(DataRequest dataRequest,DataAddress dataAddress, Policy policy) {
         Objects.requireNonNull(dataRequest, "dataRequest must always be provided");
         Objects.requireNonNull(policy, "policy must always be provided");
 
         var id = randomUUID().toString();
-
 
         return  NextCloudResourceDefinition.Builder.newInstance()
                 .id(id)
@@ -36,6 +34,4 @@ public class NextCloudProviderResourceDefinitionGenerator implements ProviderRes
 
         return NextcloudSchema.TYPE.equals(dataRequest.getDestinationType());
     }
-
-
 }

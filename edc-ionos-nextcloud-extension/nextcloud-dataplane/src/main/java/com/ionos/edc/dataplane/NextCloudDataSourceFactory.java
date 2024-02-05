@@ -3,13 +3,9 @@ package com.ionos.edc.dataplane;
 import com.ionos.edc.dataplane.validation.NextCloudDataAddressValidator;
 import com.ionos.edc.nextcloudapi.NextCloudApi;
 import com.ionos.edc.schema.NextcloudSchema;
-
 import com.ionos.edc.token.NextCloudToken;
-import dev.failsafe.RetryPolicy;
 import org.eclipse.edc.connector.dataplane.spi.pipeline.DataSource;
 import org.eclipse.edc.connector.dataplane.spi.pipeline.DataSourceFactory;
-
-import org.eclipse.edc.policy.model.Policy;
 import org.eclipse.edc.spi.result.Result;
 import org.eclipse.edc.spi.security.Vault;
 import org.eclipse.edc.spi.types.TypeManager;
@@ -43,8 +39,6 @@ public class NextCloudDataSourceFactory  implements DataSourceFactory {
 
     @Override
     public DataSource createSource(DataFlowRequest request) {
-
-
         var source = request.getSourceDataAddress();
         var destination = request.getDestinationDataAddress();
 
@@ -59,7 +53,6 @@ public class NextCloudDataSourceFactory  implements DataSourceFactory {
                         .downloadable(token.getDownloadable())
                         .url(token.getUrlToken())
                         .build();
-
 
         }else if(secret != null){
             var urlKey = nextCloudApi.generateUrlDownload(source.getStringProperty(NextcloudSchema.FILE_PATH), source.getStringProperty(NextcloudSchema.FILE_NAME));
@@ -78,8 +71,6 @@ public class NextCloudDataSourceFactory  implements DataSourceFactory {
                     .downloadable(false)
                     .build();
         }
-
     }
-
 }
 

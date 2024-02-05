@@ -6,12 +6,11 @@ import org.eclipse.edc.connector.transfer.spi.types.DataRequest;
 import org.eclipse.edc.connector.transfer.spi.types.ResourceDefinition;
 import org.eclipse.edc.policy.model.Policy;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.Objects;
-
 import static java.util.UUID.randomUUID;
 
 public class NextCloudConsumerResourceDefinitionGenerator  implements ConsumerResourceDefinitionGenerator {
+
     @Override
     public @Nullable ResourceDefinition generate(DataRequest dataRequest, Policy policy) {
         Objects.requireNonNull(dataRequest, "dataRequest must always be provided");
@@ -32,6 +31,4 @@ public class NextCloudConsumerResourceDefinitionGenerator  implements ConsumerRe
 
         return NextcloudSchema.TYPE.equals(dataRequest.getDestinationType());
     }
-
-
 }

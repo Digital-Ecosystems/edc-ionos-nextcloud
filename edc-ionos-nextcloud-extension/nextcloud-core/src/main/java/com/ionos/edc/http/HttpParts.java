@@ -9,6 +9,7 @@ import com.ionos.edc.token.NextCloudToken;
 import org.eclipse.edc.connector.transfer.spi.types.DataRequest;
 import org.eclipse.edc.policy.model.Policy;
 import org.eclipse.edc.spi.types.domain.DataAddress;
+
 @JsonTypeName("dataspaceconnector:httpParts")
 @JsonDeserialize(builder = HttpParts.Builder.class)
 public class HttpParts {
@@ -17,7 +18,6 @@ public class HttpParts {
 
     private NextCloudToken url;
     private Policy policy;
-    private Type type = Type.PROVISION;
     private String transferProcessId;
     private String resourceDefinitionId;
     private String assetId;
@@ -26,6 +26,7 @@ public class HttpParts {
     public HttpParts() {
 
     }
+
     public DataAddress getDataAddress() {
         return dataAddress;
     }
@@ -37,6 +38,7 @@ public class HttpParts {
     public NextCloudToken getUrl() {
         return url;
     }
+
     public String getAssetId() {
         return assetId;
     }
@@ -49,10 +51,10 @@ public class HttpParts {
         return policy;
     }
 
-
     public String getResourceDefinitionId() {
         return resourceDefinitionId;
     }
+
     public enum Type {
         @JsonProperty("provision")
         PROVISION,
@@ -60,14 +62,15 @@ public class HttpParts {
         @JsonProperty("deprovision")
         DEPROVISION
     }
+    
     @JsonPOJOBuilder(withPrefix = "")
     public static class Builder {
-
         private final HttpParts request;
 
         private Builder() {
             request = new HttpParts();
         }
+
         @JsonCreator
         public static Builder newInstance() {
             return new Builder();
@@ -102,12 +105,6 @@ public class HttpParts {
             return this;
         }
 
-
-
-        public Builder type(Type type) {
-            request.type = type;
-            return this;
-        }
 
         public Builder resourceDefinitionId(String resourceDefinitionId) {
             request.resourceDefinitionId = resourceDefinitionId;

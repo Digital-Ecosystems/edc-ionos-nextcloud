@@ -2,7 +2,6 @@ package com.ionos.edc.dataplane.http;
 
 import com.ionos.edc.http.HttpParts;
 import com.ionos.edc.nextcloudapi.NextCloudApi;
-import com.ionos.edc.schema.NextcloudSchema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
@@ -10,16 +9,11 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import org.eclipse.edc.connector.dataplane.spi.pipeline.PipelineService;
-import org.eclipse.edc.connector.dataplane.spi.resolver.DataAddressResolver;
 import org.eclipse.edc.spi.security.Vault;
 import org.eclipse.edc.spi.types.TypeManager;
-import org.eclipse.edc.spi.types.domain.DataAddress;
 import org.eclipse.edc.spi.monitor.Monitor;
 import org.eclipse.edc.spi.types.domain.transfer.DataFlowRequest;
-
 import java.util.concurrent.ExecutorService;
-
-import static org.eclipse.edc.spi.types.domain.DataAddress.EDC_DATA_ADDRESS_SECRET;
 
 @Consumes({ MediaType.APPLICATION_JSON })
 @Produces({ MediaType.APPLICATION_JSON })
@@ -41,7 +35,6 @@ public class NextCloudHTTPApiController implements NextCloudHTTPApi{
         this.pipelineService = pipelineService;
         this.typeManager = typeManager;
         this.vault = vault;
-
     }
 
     @POST
@@ -50,17 +43,12 @@ public class NextCloudHTTPApiController implements NextCloudHTTPApi{
         var secret = httpParts.getUrl();
         vault.storeSecret(httpParts.getDataRequest().getDataDestination().getKeyName(), typeManager.writeValueAsString(secret));
 
-       var dataflow=  DataFlowRequest.Builder.newInstance().processId(httpParts.getDataRequest().getProcessId())
+        var dataflow=  DataFlowRequest.Builder.newInstance().processId(httpParts.getDataRequest().getProcessId())
                 .sourceDataAddress(httpParts.getDataAddress())
                 .destinationDataAddress(httpParts.getDataRequest().getDataDestination())
                 .build();
 
 
         pipelineService.transfer(dataflow);
-
-
-
-
-
     }
 }

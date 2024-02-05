@@ -29,8 +29,10 @@ dependencies {
 
     implementation("com.squareup.okhttp3:okhttp:4.9.1")
     implementation("org.jsoup:jsoup:1.14.3")
+
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+    
 }
 
 tasks.test {

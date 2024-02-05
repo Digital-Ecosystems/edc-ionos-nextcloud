@@ -8,13 +8,11 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import java.io.InputStream;
 
-
 public class NextCloudImpl implements NextCloudApi {
-
-    OkHttpClient client = new OkHttpClient();
-    String basicUrl = "";
-    String username = "";
-    String password = "";
+    private OkHttpClient client = new OkHttpClient();
+    private String basicUrl = "";
+    private String username = "";
+    private String password = "";
 
     public NextCloudImpl(String basicUrl, String username, String password) {
         this.basicUrl = basicUrl;
@@ -35,14 +33,13 @@ public class NextCloudImpl implements NextCloudApi {
         String fileId = retrieveId(filePath, fileName);
         String url = basicUrl + urlPart + fileId;
 
-
-
         Request request = new Request.Builder()
                 .url(url)
                 .addHeader("OCS-APIRequest", "true")
                 .addHeader("Authorization", Credentials.basic(username, password))
                 .post(RequestBody.create(null, new byte[0]))
                 .build();
+
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
                 throw new EdcException("Unexpected code " + response);
@@ -52,19 +49,16 @@ public class NextCloudImpl implements NextCloudApi {
             Document document = Jsoup.parse(xmlResponse);
             String OC_URL = "url";
 
-
             return document.select(OC_URL).text();
 
         } catch (Exception e) {
-            throw new EdcException("Error generation URL"+ e);
+            throw new EdcException("Error generation URL" + e);
         }
 
     }
 
     @Override
     public byte[] downloadFile( String url) {
-
-
 
         Request request = new Request.Builder()
                 .url(url)
@@ -78,23 +72,18 @@ public class NextCloudImpl implements NextCloudApi {
 
             return in.readAllBytes();
         } catch (IOException e) {
-            throw new EdcException("Error when downloading the file: "+e);
+            throw new EdcException("Error when downloading the file: " + e);
         }
     }
 
     @Override
     public void uploadFile(String filePath, String fileName, ByteArrayInputStream part) {
-
-
         String urlPart = "/remote.php/dav/files/" + username + "/";
         String url = basicUrl + urlPart +filePath+ "/" +fileName;
-
-
 
         MediaType mediaType = MediaType.parse("application/octet-stream");
 
         RequestBody body = RequestBody.Companion.create(part.readAllBytes(), mediaType);
-
 
         Request request = new Request.Builder()
                 .url(url)
@@ -102,12 +91,11 @@ public class NextCloudImpl implements NextCloudApi {
                 .addHeader("Authorization", Credentials.basic(username, password))
                 .put(body)
                 .build();
+
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
                 throw new IOException("Unexpected code " + response);
             }
-
-
         } catch (Exception e) {
             throw new EdcException("Error uploading file: "+ e);
         }
@@ -115,11 +103,9 @@ public class NextCloudImpl implements NextCloudApi {
 
     @Override
     public void fileShare(String filePath, String fileName, String shareWith, String shareType, String permissionType, String expireDate) {
-
         String FILESHARE_ADDRESS = "/ocs/v2.php/apps/files_sharing/api/v1/shares?";
         String url = basicUrl + FILESHARE_ADDRESS +
                 "path=" +filePath +"/"+ fileName + "&shareType="+shareType+"&shareWith=" + shareWith  +"&publicUpload=false&permissions=" + permissionType + "&expireDate=" + expireDate;
-
 
         HttpUrl urlHttp = HttpUrl.parse(url);
         Request request = new Request.Builder()
@@ -128,6 +114,7 @@ public class NextCloudImpl implements NextCloudApi {
                 .addHeader("Authorization", Credentials.basic(username, password))
                 .post(RequestBody.create(null, ""))
                 .build();
+        
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
                 throw new EdcException("Unexpected code " + response);
@@ -137,10 +124,7 @@ public class NextCloudImpl implements NextCloudApi {
         }
     }
 
-
     private String retrieveId(String path, String fileName) {
-         basicUrl = "http://localhost:8080";
-
         String urlPart = "/remote.php/dav/files/" + username ;
         String url = basicUrl + urlPart+"/" + path+"/"+fileName;
         String body = "<?xml version=\"1.0\"?>\n" +
