@@ -115,3 +115,24 @@ java -Dedc.fs.config=resources/config.properties -jar build/libs/dataspace-conne
 ## Example
 
 To see this extension in action please check the [samples](https://github.com/Digital-Ecosystems/edc-ionos-samples) repository.
+
+## Nextcloud EDC App
+
+In order to facilitate the participation of an entity in a DataSpace, we are creating a Proof of Concept (PoC) of an application that one can use through the Nextcloud service from IONOS. Using the application, one could do the following:
+- Join a DataSpace;
+- Manage a catalog of assets;
+- Manage policies and contracts;
+- Do contract negotiations;
+
+The application will interact with a Catalog and with EDC Connectors.
+
+Some printscreens of the application:
+
+![DS Configuration](imgs/screenshot1.png)
+Simple DataSpace configuration
+
+![Adding assets](imgs/screenshot2.png)
+Choosing files to share within the DataSpace
+
+![Checking the DS catalog](imgs/screenshot3.png)
+Checking the DataSpace catalog
