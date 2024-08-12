@@ -1,5 +1,5 @@
 # -buster is required to have apt available
-FROM openjdk:17-slim-buster
+FROM openjdk:18-slim-buster
 
 # by default curl is not available, so install it
 RUN apt update && apt install curl -y
