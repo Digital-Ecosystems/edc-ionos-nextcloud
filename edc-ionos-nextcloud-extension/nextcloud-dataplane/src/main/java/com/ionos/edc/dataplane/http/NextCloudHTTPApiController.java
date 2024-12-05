@@ -13,6 +13,8 @@ import org.eclipse.edc.spi.security.Vault;
 import org.eclipse.edc.spi.types.TypeManager;
 import org.eclipse.edc.spi.monitor.Monitor;
 import org.eclipse.edc.spi.types.domain.transfer.DataFlowRequest;
+import org.eclipse.edc.spi.types.domain.transfer.DataFlowStartMessage;
+
 import java.util.concurrent.ExecutorService;
 
 @Consumes({ MediaType.APPLICATION_JSON })
@@ -43,7 +45,7 @@ public class NextCloudHTTPApiController implements NextCloudHTTPApi{
         var secret = httpParts.getUrl();
         vault.storeSecret(httpParts.getDataRequest().getDataDestination().getKeyName(), typeManager.writeValueAsString(secret));
 
-        var dataflow=  DataFlowRequest.Builder.newInstance().processId(httpParts.getDataRequest().getProcessId())
+        var dataflow=  DataFlowStartMessage.Builder.newInstance().processId(httpParts.getDataRequest().getId())
                 .sourceDataAddress(httpParts.getDataAddress())
                 .destinationDataAddress(httpParts.getDataRequest().getDataDestination())
                 .build();

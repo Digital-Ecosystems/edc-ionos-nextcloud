@@ -2,12 +2,12 @@ package com.ionos.edc.provision;
 
 import java.util.Objects;
 import com.ionos.edc.schema.NextcloudSchema;
-import org.eclipse.edc.connector.transfer.spi.types.DataRequest;
-import org.eclipse.edc.connector.transfer.spi.types.ResourceDefinition;
+import org.eclipse.edc.connector.controlplane.transfer.spi.types.TransferProcess;
+import org.eclipse.edc.connector.controlplane.transfer.spi.types.ResourceDefinition;
 import org.eclipse.edc.spi.types.domain.DataAddress;
 
 public class NextCloudResourceDefinition extends ResourceDefinition {
-    private DataRequest dataRequest;
+    private TransferProcess dataRequest;
     private DataAddress dataAddress;
 
 
@@ -15,7 +15,7 @@ public class NextCloudResourceDefinition extends ResourceDefinition {
 
     }
 
-    public DataRequest getDataRequest() {
+    public TransferProcess getDataRequest() {
         return dataRequest;
     }
 
@@ -38,7 +38,7 @@ public class NextCloudResourceDefinition extends ResourceDefinition {
             return new Builder();
         }
 
-       public Builder DataRequest(DataRequest dataRequest) {
+       public Builder DataRequest(TransferProcess dataRequest) {
             resourceDefinition.dataRequest = dataRequest;
             return this;
         }

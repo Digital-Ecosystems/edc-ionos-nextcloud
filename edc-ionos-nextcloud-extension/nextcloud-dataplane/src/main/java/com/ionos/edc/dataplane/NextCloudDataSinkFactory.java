@@ -7,13 +7,13 @@ import com.ionos.edc.token.NextCloudToken;
 import org.eclipse.edc.connector.dataplane.spi.pipeline.DataSink;
 import org.eclipse.edc.connector.dataplane.spi.pipeline.DataSinkFactory;
 import org.eclipse.edc.spi.types.domain.DataAddress;
+import org.eclipse.edc.spi.types.domain.transfer.DataFlowStartMessage;
 import org.eclipse.edc.validator.spi.Validator;
 import org.eclipse.edc.spi.EdcException;
 import org.eclipse.edc.spi.monitor.Monitor;
 import org.eclipse.edc.spi.result.Result;
 import org.eclipse.edc.spi.security.Vault;
 import org.eclipse.edc.spi.types.TypeManager;
-import org.eclipse.edc.spi.types.domain.transfer.DataFlowRequest;
 import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.ExecutorService;
 
@@ -35,20 +35,25 @@ public class NextCloudDataSinkFactory  implements DataSinkFactory {
     }
 
     @Override
-    public boolean canHandle(DataFlowRequest request) {
+    public String supportedType() {
+        return NextcloudSchema.TYPE;
+    }
+
+    @Override
+    public boolean canHandle(DataFlowStartMessage request) {
         
         return NextcloudSchema.TYPE.equals(request.getDestinationDataAddress().getType());
     }
 
     @Override
-    public @NotNull Result<Void> validateRequest(DataFlowRequest request) {
+    public @NotNull Result<Void> validateRequest(DataFlowStartMessage request) {
         var destination = request.getDestinationDataAddress();
 
         return validation.validate(destination).toResult();
     }
 
     @Override
-    public DataSink createSink(DataFlowRequest request) {
+    public DataSink createSink(DataFlowStartMessage request) {
         var validationResult = validateRequest(request);
         if (validationResult.failed()) {
             throw new EdcException(String.join(", ", validationResult.getFailureMessages()));

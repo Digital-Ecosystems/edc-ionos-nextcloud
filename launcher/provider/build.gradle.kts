@@ -28,8 +28,6 @@ dependencies{
     implementation("${edcGroup}:vault-hashicorp:${edcVersion}")
     implementation("${edcGroup}:iam-mock:${edcVersion}")
 
-    implementation(project(":edc-ionos-nextcloud-extension:nextcloud-provision"))
-
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }

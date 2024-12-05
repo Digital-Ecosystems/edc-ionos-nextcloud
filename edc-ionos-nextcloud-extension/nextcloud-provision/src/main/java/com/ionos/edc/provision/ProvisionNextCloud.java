@@ -1,13 +1,14 @@
 package com.ionos.edc.provision;
 
 import com.ionos.edc.nextcloudapi.NextCloudApi;
+import com.ionos.edc.token.NextCloudToken;
 import dev.failsafe.RetryPolicy;
-import org.eclipse.edc.connector.transfer.spi.provision.ProvisionManager;
-import org.eclipse.edc.connector.transfer.spi.provision.ResourceManifestGenerator;
+import org.eclipse.edc.connector.controlplane.transfer.spi.provision.ProvisionManager;
+import org.eclipse.edc.connector.controlplane.transfer.spi.provision.ResourceManifestGenerator;
 import org.eclipse.edc.runtime.metamodel.annotation.Extension;
 import org.eclipse.edc.runtime.metamodel.annotation.Inject;
 import org.eclipse.edc.runtime.metamodel.annotation.Setting;
-import org.eclipse.edc.spi.http.EdcHttpClient;
+import org.eclipse.edc.http.spi.EdcHttpClient;
 import org.eclipse.edc.spi.monitor.Monitor;
 import org.eclipse.edc.spi.security.Vault;
 import org.eclipse.edc.spi.system.ServiceExtension;
@@ -65,6 +66,6 @@ public class ProvisionNextCloud implements ServiceExtension {
     }
 
     private void registerTypes(TypeManager typeManager) {
-        typeManager.registerTypes(NextCloudProvisionedResource.class, NextCloudResourceDefinition.class);
+        typeManager.registerTypes(NextCloudProvisionedResource.class, NextCloudResourceDefinition.class, NextCloudToken.class);
     }
 }

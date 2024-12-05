@@ -8,14 +8,14 @@ import com.ionos.edc.nextcloudapi.NextCloudApi;
 import com.ionos.edc.schema.NextcloudSchema;
 import com.ionos.edc.token.NextCloudToken;
 import dev.failsafe.RetryPolicy;
-import org.eclipse.edc.connector.transfer.spi.provision.Provisioner;
-import org.eclipse.edc.connector.transfer.spi.types.*;
+import org.eclipse.edc.connector.controlplane.transfer.spi.provision.Provisioner;
+import org.eclipse.edc.connector.controlplane.transfer.spi.types.*;
+import org.eclipse.edc.http.spi.EdcHttpClient;
 import org.eclipse.edc.policy.model.Policy;
 import org.eclipse.edc.spi.EdcException;
 import org.eclipse.edc.spi.monitor.Monitor;
 import org.eclipse.edc.spi.response.ResponseStatus;
 import org.eclipse.edc.spi.response.StatusResult;
-import org.eclipse.edc.spi.http.EdcHttpClient;
 import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -25,7 +25,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.concurrent.CompletableFuture;
-import static org.eclipse.edc.spi.CoreConstants.EDC_NAMESPACE;
+
+import static org.eclipse.edc.spi.constants.CoreConstants.EDC_NAMESPACE;
 
 public class NextCloudProvisioner  implements Provisioner<NextCloudResourceDefinition, NextCloudProvisionedResource> {
     private static final MediaType JSON = MediaType.get("application/json");
@@ -136,7 +137,7 @@ public class NextCloudProvisioner  implements Provisioner<NextCloudResourceDefin
             var expiryTime = OffsetDateTime.now().plusHours(1);
             var urlToken = new NextCloudToken("", false, expiryTime.toInstant().toEpochMilli());
 
-            var response = ProvisionResponse.Builder.newInstance().resource(resource).inProcess(true).secretToken(urlToken).build();
+            var response = ProvisionResponse.Builder.newInstance().resource(resource).inProcess(true).secretToken((SecretToken) urlToken).build();
             try {
                 nextCloudApi.fileShare(filePath,
                         fileName,

@@ -1,9 +1,9 @@
 package com.ionos.edc.provision;
 
 import com.ionos.edc.schema.NextcloudSchema;
-import org.eclipse.edc.connector.transfer.spi.provision.ProviderResourceDefinitionGenerator;
-import org.eclipse.edc.connector.transfer.spi.types.DataRequest;
-import org.eclipse.edc.connector.transfer.spi.types.ResourceDefinition;
+import org.eclipse.edc.connector.controlplane.transfer.spi.types.TransferProcess;
+import org.eclipse.edc.connector.controlplane.transfer.spi.provision.ProviderResourceDefinitionGenerator;
+import org.eclipse.edc.connector.controlplane.transfer.spi.types.ResourceDefinition;
 import org.eclipse.edc.policy.model.Policy;
 import org.eclipse.edc.spi.types.domain.DataAddress;
 import org.jetbrains.annotations.Nullable;
@@ -13,7 +13,7 @@ import static java.util.UUID.randomUUID;
 public class NextCloudProviderResourceDefinitionGenerator implements ProviderResourceDefinitionGenerator {
 
     @Override
-    public @Nullable ResourceDefinition generate(DataRequest dataRequest,DataAddress dataAddress, Policy policy) {
+    public @Nullable ResourceDefinition generate(TransferProcess dataRequest, DataAddress dataAddress, Policy policy) {
         Objects.requireNonNull(dataRequest, "dataRequest must always be provided");
         Objects.requireNonNull(policy, "policy must always be provided");
 
@@ -27,7 +27,7 @@ public class NextCloudProviderResourceDefinitionGenerator implements ProviderRes
     }
 
     @Override
-    public boolean canGenerate(DataRequest dataRequest, DataAddress dataAddress, Policy policy) {
+    public boolean canGenerate(TransferProcess dataRequest, DataAddress dataAddress, Policy policy) {
         Objects.requireNonNull(dataRequest, "dataRequest must always be provided");
         Objects.requireNonNull(dataAddress, "dataAddress must always be provided");
         Objects.requireNonNull(policy, "policy must always be provided");
