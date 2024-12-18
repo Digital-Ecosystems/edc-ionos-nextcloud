@@ -8,6 +8,9 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.eclipse.edc.web.spi.ApiErrorDetail;
+import org.springframework.http.ResponseEntity;
+
+import java.net.http.HttpResponse;
 
 public interface NextCloudHTTPApi {
 
@@ -17,5 +20,5 @@ public interface NextCloudHTTPApi {
                     @ApiResponse(responseCode = "400", description = "Request was malformed, e.g. id was null",
                             content = @Content(array = @ArraySchema(schema = @Schema(implementation = ApiErrorDetail.class))))
             })
-    void startTransferProcess (HttpParts httpParts);
+    ResponseEntity<String> startTransferProcess (HttpParts httpParts);
 }

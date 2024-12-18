@@ -19,6 +19,7 @@ public class HttpParts {
     private NextCloudToken url;
     private Policy policy;
     private String transferProcessId;
+    private String processId;
     private String resourceDefinitionId;
     private String assetId;
 
@@ -45,6 +46,12 @@ public class HttpParts {
 
     public String getTransferProcessId() {
         return transferProcessId;
+    }
+
+    public String getProcessId() { return processId; }
+
+    public void setProcessId(String processId) {
+        this.processId = processId;
     }
 
     public Policy getPolicy() {
@@ -97,6 +104,10 @@ public class HttpParts {
 
         public Builder transferProcessId(String transferProcessId) {
             request.transferProcessId = transferProcessId;
+            return this;
+        }
+        public Builder processId(String processId) {
+            request.processId = processId;
             return this;
         }
 

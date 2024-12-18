@@ -55,7 +55,6 @@ public class NextCloudResourceDefinition extends ResourceDefinition {
             Objects.requireNonNull(resourceDefinition.dataRequest.getDataDestination(), "Destination is required");
             Objects.requireNonNull(resourceDefinition.dataRequest.getDataDestination().getStringProperty(NextcloudSchema.HTTP_RECEIVER), "Destination Http Receiver is required");
             Objects.requireNonNull(resourceDefinition.dataRequest.getDataDestination().getStringProperty(NextcloudSchema.FILE_PATH), "Destination file path is required");
-            Objects.requireNonNull(resourceDefinition.dataRequest.getDataDestination().getStringProperty(NextcloudSchema.FILE_NAME), "Destination file name is required");
         }
     }
 }

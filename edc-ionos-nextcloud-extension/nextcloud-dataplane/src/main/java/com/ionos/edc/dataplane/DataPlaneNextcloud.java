@@ -5,6 +5,8 @@ import com.ionos.edc.nextcloudapi.NextCloudApi;
 import org.eclipse.edc.connector.api.management.configuration.ManagementApiConfiguration;
 import org.eclipse.edc.connector.dataplane.spi.pipeline.DataTransferExecutorServiceContainer;
 import org.eclipse.edc.connector.dataplane.spi.pipeline.PipelineService;
+import org.eclipse.edc.connector.transfer.spi.TransferProcessManager;
+import org.eclipse.edc.connector.transfer.spi.store.TransferProcessStore;
 import org.eclipse.edc.runtime.metamodel.annotation.Extension;
 import org.eclipse.edc.runtime.metamodel.annotation.Inject;
 import org.eclipse.edc.spi.security.Vault;
@@ -35,6 +37,11 @@ public class DataPlaneNextcloud  implements ServiceExtension {
     @Inject
     private EdcHttpClient httpClient;
 
+    @Inject
+    private TransferProcessStore transferProcessStore;
+    @Inject
+    private TransferProcessManager transferProcessManager;
+
     @Override
     public String name() {
         return NAME;
@@ -53,7 +60,8 @@ public class DataPlaneNextcloud  implements ServiceExtension {
 
 
         pipelineService.registerFactory(sinkFactory);
-        NextCloudHTTPApiController nextApi =  new NextCloudHTTPApiController(nextCloudApi,executorContainer.getExecutorService(), monitor,pipelineService, typeManager, vault);
+        NextCloudHTTPApiController nextApi =  new NextCloudHTTPApiController(nextCloudApi,executorContainer.getExecutorService(),
+                monitor,pipelineService, typeManager, vault, transferProcessStore);
         webService.registerResource(managementApiConfig.getContextAlias(),nextApi);
         context.getMonitor().info(NAME+ " Extension initialized!");
     }
