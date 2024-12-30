@@ -3,8 +3,10 @@ package com.ionos.edc.provision;
 import com.ionos.edc.nextcloudapi.NextCloudApi;
 import com.ionos.edc.token.NextCloudToken;
 import dev.failsafe.RetryPolicy;
+import org.eclipse.edc.connector.controlplane.services.spi.transferprocess.TransferProcessService;
 import org.eclipse.edc.connector.controlplane.transfer.spi.provision.ProvisionManager;
 import org.eclipse.edc.connector.controlplane.transfer.spi.provision.ResourceManifestGenerator;
+import org.eclipse.edc.connector.controlplane.transfer.spi.types.TransferProcess;
 import org.eclipse.edc.runtime.metamodel.annotation.Extension;
 import org.eclipse.edc.runtime.metamodel.annotation.Inject;
 import org.eclipse.edc.runtime.metamodel.annotation.Setting;
@@ -31,6 +33,8 @@ public class ProvisionNextCloud implements ServiceExtension {
     private NextCloudApi nextCloudApi;
     @Inject
     private EdcHttpClient httpClient;
+    @Inject
+    private TransferProcessService transferProcessService;
     @Setting
     private static final String HTTP_RECEIVER_AUTH_KEY = "edc.api.auth.key";
 
@@ -49,7 +53,7 @@ public class ProvisionNextCloud implements ServiceExtension {
         var retryPolicy = (RetryPolicy<Object>) context.getService(RetryPolicy.class);
         monitor.debug("NextCloudProvisionExtension");
         var authKey = context.getSetting(HTTP_RECEIVER_AUTH_KEY, null);
-        var nextCloudProvisioner = new NextCloudProvisioner(retryPolicy, monitor, nextCloudApi, httpClient,typeManager.getMapper(), authKey);
+        var nextCloudProvisioner = new NextCloudProvisioner(retryPolicy, monitor, nextCloudApi, httpClient,typeManager.getMapper(), authKey, transferProcessService);
 
         provisionManager.register(nextCloudProvisioner);
 

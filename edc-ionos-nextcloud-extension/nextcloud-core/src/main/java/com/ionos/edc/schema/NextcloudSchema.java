@@ -1,6 +1,6 @@
 package com.ionos.edc.schema;
 
-import static org.eclipse.edc.spi.CoreConstants.EDC_NAMESPACE;
+import static org.eclipse.edc.spi.constants.CoreConstants.EDC_NAMESPACE;
 
 public interface  NextcloudSchema {
     String TYPE = "Nextcloud";

@@ -8,6 +8,8 @@ import com.ionos.edc.nextcloudapi.NextCloudApi;
 import com.ionos.edc.schema.NextcloudSchema;
 import com.ionos.edc.token.NextCloudToken;
 import dev.failsafe.RetryPolicy;
+
+import org.eclipse.edc.connector.controlplane.services.spi.transferprocess.TransferProcessService;
 import org.eclipse.edc.connector.controlplane.transfer.spi.provision.Provisioner;
 import org.eclipse.edc.connector.controlplane.transfer.spi.types.*;
 import org.eclipse.edc.http.spi.EdcHttpClient;
@@ -24,9 +26,11 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import static org.eclipse.edc.spi.constants.CoreConstants.EDC_NAMESPACE;
+import static org.eclipse.edc.web.spi.exception.ServiceResultHandler.exceptionMapper;
 
 public class NextCloudProvisioner  implements Provisioner<NextCloudResourceDefinition, NextCloudProvisionedResource> {
     private static final MediaType JSON = MediaType.get("application/json");
@@ -37,14 +41,15 @@ public class NextCloudProvisioner  implements Provisioner<NextCloudResourceDefin
     private final ObjectMapper mapper;
     private String authKey;
     private String endpoint = "/nextcloudtransfer";
-
-    public NextCloudProvisioner(RetryPolicy<Object> retryPolicy, Monitor monitor, NextCloudApi nextCloudApi, EdcHttpClient httpClient, ObjectMapper mapper, String authKey) {
+    private final TransferProcessService transferProcessService;
+    public NextCloudProvisioner(RetryPolicy<Object> retryPolicy, Monitor monitor, NextCloudApi nextCloudApi, EdcHttpClient httpClient, ObjectMapper mapper, String authKey, TransferProcessService transferProcessService) {
         this.retryPolicy = retryPolicy;
         this.monitor = monitor;
         this.nextCloudApi = nextCloudApi;
         this.httpClient = httpClient;
         this.mapper = mapper;
         this.authKey = authKey;
+        this.transferProcessService = transferProcessService;
 
     }
 
@@ -93,17 +98,8 @@ public class NextCloudProvisioner  implements Provisioner<NextCloudResourceDefin
                 var urlToken = new NextCloudToken(urlKey, true, expiryTime.toInstant().toEpochMilli());
 
                 Request request;
-                try {
-                    if (resourceDefinition.getDataRequest().getDataDestination().getStringProperty(NextcloudSchema.HTTP_RECEIVER) == null) {
-                        throw new EdcException("No receiverHttpEndpoint available");
-                    }
 
-                    request = createRequest(resourceDefinition, urlToken, policy);
-                } catch (JsonProcessingException e) {
-                    monitor.severe("Error serializing: ", e);
-                    return CompletableFuture.completedFuture(StatusResult.failure(ResponseStatus.FATAL_ERROR, "Fatal error serializing request: " + e.getMessage()));
-                }
-
+                request = createRequest(resourceDefinition, urlToken, policy);
                 try (var response = httpClient.execute(request)) {
 
                     if (response.isSuccessful()) {
@@ -116,6 +112,7 @@ public class NextCloudProvisioner  implements Provisioner<NextCloudResourceDefin
                         return CompletableFuture.completedFuture(StatusResult.failure(ResponseStatus.FATAL_ERROR, "HttpProviderProvisioner: received fatal error code: " + response.code()));
                     }
                 }
+
 
             } catch (Exception e) {
                 monitor.severe("Error provisioning", e);
@@ -162,7 +159,8 @@ public class NextCloudProvisioner  implements Provisioner<NextCloudResourceDefin
     private Request createRequest(NextCloudResourceDefinition resourceDefinition, NextCloudToken url, Policy policy) throws JsonProcessingException {
         var provisionerRequest = HttpParts.Builder.newInstance()
                 .dataAddress(resourceDefinition.getDataAddress())
-                .dataRequest(resourceDefinition.getDataRequest())
+                .dataRequest(resourceDefinition.getDataRequest().getDataDestination())
+                .processId(resourceDefinition.getDataRequest().getId())
                 .assetId(resourceDefinition.getDataRequest().getAssetId())
                 .transferProcessId(resourceDefinition.getTransferProcessId())
                 .resourceDefinitionId(resourceDefinition.getId())
@@ -170,6 +168,7 @@ public class NextCloudProvisioner  implements Provisioner<NextCloudResourceDefin
                 .url(url)
                 .build();
         var requestBody = RequestBody.create(mapper.writeValueAsString(provisionerRequest), JSON);
+
 
         return new Request.Builder()
                 .addHeader("X-API-Key", "%s".formatted(authKey))
@@ -179,6 +178,9 @@ public class NextCloudProvisioner  implements Provisioner<NextCloudResourceDefin
                         .getStringProperty(NextcloudSchema.HTTP_RECEIVER) + endpoint)
                 .post(requestBody).build();
     }
+
+
+
 
     private String nowDate(int plusDays) {
         LocalDateTime now = LocalDateTime.now();

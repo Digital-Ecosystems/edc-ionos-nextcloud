@@ -14,13 +14,14 @@ import org.eclipse.edc.spi.types.domain.DataAddress;
 @JsonDeserialize(builder = HttpParts.Builder.class)
 public class HttpParts {
     private DataAddress dataAddress;
-    private TransferProcess dataRequest;
+    private DataAddress dataRequest;
 
     private NextCloudToken url;
     private Policy policy;
     private String transferProcessId;
     private String resourceDefinitionId;
     private String assetId;
+    private String processId;
 
 
     public HttpParts() {
@@ -31,7 +32,7 @@ public class HttpParts {
         return dataAddress;
     }
 
-    public TransferProcess getDataRequest() {
+    public DataAddress getDataRequest() {
         return dataRequest;
     }
 
@@ -54,6 +55,8 @@ public class HttpParts {
     public String getResourceDefinitionId() {
         return resourceDefinitionId;
     }
+
+    public String getProcessId() {return processId;}
 
     public enum Type {
         @JsonProperty("provision")
@@ -81,7 +84,7 @@ public class HttpParts {
             return this;
         }
 
-        public Builder dataRequest(TransferProcess dataRequest) {
+        public Builder dataRequest(DataAddress dataRequest) {
             request.dataRequest = dataRequest;
             return this;
         }
@@ -108,6 +111,11 @@ public class HttpParts {
 
         public Builder resourceDefinitionId(String resourceDefinitionId) {
             request.resourceDefinitionId = resourceDefinitionId;
+            return this;
+        }
+
+        public Builder processId(String processId) {
+            request.processId = processId;
             return this;
         }
 

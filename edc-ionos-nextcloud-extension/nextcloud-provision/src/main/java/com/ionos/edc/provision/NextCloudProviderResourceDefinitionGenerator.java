@@ -32,6 +32,6 @@ public class NextCloudProviderResourceDefinitionGenerator implements ProviderRes
         Objects.requireNonNull(dataAddress, "dataAddress must always be provided");
         Objects.requireNonNull(policy, "policy must always be provided");
 
-        return NextcloudSchema.TYPE.equals(dataRequest.getDestinationType());
+        return NextcloudSchema.TYPE.equals(dataAddress.getType());
     }
 }
