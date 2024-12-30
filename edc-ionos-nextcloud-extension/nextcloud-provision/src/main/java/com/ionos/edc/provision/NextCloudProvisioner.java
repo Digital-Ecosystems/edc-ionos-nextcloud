@@ -160,7 +160,6 @@ public class NextCloudProvisioner  implements Provisioner<NextCloudResourceDefin
         var provisionerRequest = HttpParts.Builder.newInstance()
                 .dataAddress(resourceDefinition.getDataAddress())
                 .dataRequest(resourceDefinition.getDataRequest().getDataDestination())
-                .processId(resourceDefinition.getDataRequest().getId())
                 .assetId(resourceDefinition.getDataRequest().getAssetId())
                 .transferProcessId(resourceDefinition.getTransferProcessId())
                 .processId(resourceDefinition.getDataRequest().getId())

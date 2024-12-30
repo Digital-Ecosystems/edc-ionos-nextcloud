@@ -22,7 +22,7 @@ public class HttpParts {
     private String processId;
     private String resourceDefinitionId;
     private String assetId;
-    private String processId;
+
 
 
     public HttpParts() {
@@ -63,7 +63,6 @@ public class HttpParts {
         return resourceDefinitionId;
     }
 
-    public String getProcessId() {return processId;}
 
     public enum Type {
         @JsonProperty("provision")
@@ -125,10 +124,7 @@ public class HttpParts {
             return this;
         }
 
-        public Builder processId(String processId) {
-            request.processId = processId;
-            return this;
-        }
+
 
         public HttpParts build() {
             return request;
