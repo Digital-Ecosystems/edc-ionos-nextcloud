@@ -85,7 +85,7 @@ public class NextCloudProvisioner  implements Provisioner<NextCloudResourceDefin
                     .fileName(fileNameDest)
                     .urlKey(filePathDest + fileNameDest + resourceDefinition.getId())
                     .resourceDefinitionId(resourceDefinition.getId())
-                    .transferProcessId(resourceDefinition.getTransferProcessId())
+                    .transferProcessId(resourceDefinition.getDataRequest().getId())
                     .hasToken(true);
 
             var resource = resourceBuilder.build();
@@ -163,6 +163,7 @@ public class NextCloudProvisioner  implements Provisioner<NextCloudResourceDefin
                 .processId(resourceDefinition.getDataRequest().getId())
                 .assetId(resourceDefinition.getDataRequest().getAssetId())
                 .transferProcessId(resourceDefinition.getTransferProcessId())
+                .processId(resourceDefinition.getDataRequest().getId())
                 .resourceDefinitionId(resourceDefinition.getId())
                 .policy(policy)
                 .url(url)
