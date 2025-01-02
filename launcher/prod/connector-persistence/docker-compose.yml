@@ -1,0 +1,9 @@
+services:
+  connector:
+    image: nextcloud-connector
+    ports:
+      - "8181:8181"
+      - "8182:8182"
+      - "8282:8282"
+    environment:
+      EDC_FS_CONFIG: /resources/config.properties
