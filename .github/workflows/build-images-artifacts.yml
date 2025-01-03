@@ -66,12 +66,36 @@ jobs:
         id: build-and-push-connector
         uses: docker/build-push-action@v4
         with:
-          context: ./connector
-          file: ./connector/Dockerfile
+          context: ./laucher/prod/connector
+          file: ./laucher/prod/connector/Dockerfile
           push: true
           tags: ${{ steps.connector-meta.outputs.tags }}
           labels: ${{ steps.connector-meta.outputs.labels }}
+      - name: Docker "connector-persistence" meta
+        id: connector-persistence-meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/connector
+          tags: |
+            type=raw,value=persistence-latest,enable={{is_default_branch}}
+            ${{ github.ref_name }}-persistence
 
+      - name: Build and push "connector-persistence"
+        id: build-and-push-connector-persistence
+        uses: docker/build-push-action@v4
+        with:
+          context: ./launcher/prod/connector-persistence
+          file: ./launcher/prod/connector-persistence/Dockerfile
+          push: true
+          tags: ${{ steps.connector-persistence-meta.outputs.tags }}
+          labels: ${{ steps.connector-persistence-meta.outputs.labels }}
+
+      - name: Sign "connector-persistence" image
+        run: |
+          cosign sign -y --key cosign.key \
+          ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/connector@${{ steps.build-and-push-connector-persistence.outputs.digest }}
+        env:
+          COSIGN_PASSWORD: ${{ secrets.SIGNING_SECRET_PASSWORD }}
       
 
   build-and-publish-artifacts:
