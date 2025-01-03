@@ -18,7 +18,7 @@ variable "ids_webhook_address" {
 
 variable "image_repository" {
   type = string
-  default = "ghcr.io/digital-ecosystems/connector"
+  default = "ghcr.io/digital-ecosystems/nextcloud-connector"
 }
 
 variable "image_tag" {
@@ -51,11 +51,25 @@ variable "pg_password" {
   default = "postgres"
 }
 
-variable "s3_endpoint_region" {}
-variable "ionos_token" {}
+
 
 variable "vaultname" {
   default = "vault"
+}
+
+variable "nextcloud_endpoint" {
+  type = string
+  default = "http://localhost:8080"
+}
+
+variable "nextcloud_username" {
+  type = string
+  default = "admin"
+}
+
+variable "nextcloud_password" {
+  type = string
+  default = "password"
 }
 
 locals {

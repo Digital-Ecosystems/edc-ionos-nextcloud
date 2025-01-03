@@ -13,7 +13,7 @@ variable "kubeconfig" {
 }
 
 variable "namespace" {
-  default = "edc-ionos-s3"
+  default = "edc-ionos-nextcloud"
 }
 
 variable "vaultname" {

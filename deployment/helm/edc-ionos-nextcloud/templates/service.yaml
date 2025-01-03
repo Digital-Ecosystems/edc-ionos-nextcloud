@@ -28,4 +28,4 @@ spec:
       protocol: TCP
       name: control
   selector:
-    {{- include "edc-ionos-s3.selectorLabels" . | nindent 4 }}
+    {{- include "edc-ionos-nextcloud.selectorLabels" . | nindent 4 }}
