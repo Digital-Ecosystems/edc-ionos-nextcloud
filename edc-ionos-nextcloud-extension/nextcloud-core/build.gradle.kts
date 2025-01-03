@@ -34,7 +34,10 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     
 }
-
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
 tasks.test {
     useJUnitPlatform()
 }

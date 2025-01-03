@@ -38,7 +38,10 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("${edcGroup}:json-ld:${edcVersion}")
 }
-
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
 tasks.test {
     useJUnitPlatform()
 }
