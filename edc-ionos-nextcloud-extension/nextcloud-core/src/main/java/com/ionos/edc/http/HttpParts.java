@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.ionos.edc.token.NextCloudToken;
-import org.eclipse.edc.connector.transfer.spi.types.DataRequest;
+import org.eclipse.edc.connector.controlplane.transfer.spi.types.TransferProcess;;
 import org.eclipse.edc.policy.model.Policy;
 import org.eclipse.edc.spi.types.domain.DataAddress;
 
@@ -14,7 +14,7 @@ import org.eclipse.edc.spi.types.domain.DataAddress;
 @JsonDeserialize(builder = HttpParts.Builder.class)
 public class HttpParts {
     private DataAddress dataAddress;
-    private DataRequest dataRequest;
+    private DataAddress dataRequest;
 
     private NextCloudToken url;
     private Policy policy;
@@ -22,6 +22,7 @@ public class HttpParts {
     private String processId;
     private String resourceDefinitionId;
     private String assetId;
+
 
 
     public HttpParts() {
@@ -32,7 +33,7 @@ public class HttpParts {
         return dataAddress;
     }
 
-    public DataRequest getDataRequest() {
+    public DataAddress getDataRequest() {
         return dataRequest;
     }
 
@@ -62,6 +63,7 @@ public class HttpParts {
         return resourceDefinitionId;
     }
 
+
     public enum Type {
         @JsonProperty("provision")
         PROVISION,
@@ -88,7 +90,7 @@ public class HttpParts {
             return this;
         }
 
-        public Builder dataRequest(DataRequest dataRequest) {
+        public Builder dataRequest(DataAddress dataRequest) {
             request.dataRequest = dataRequest;
             return this;
         }
@@ -121,6 +123,8 @@ public class HttpParts {
             request.resourceDefinitionId = resourceDefinitionId;
             return this;
         }
+
+
 
         public HttpParts build() {
             return request;

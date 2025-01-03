@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import org.eclipse.edc.connector.transfer.spi.types.ProvisionedDataDestinationResource;
+import org.eclipse.edc.connector.controlplane.transfer.spi.types.ProvisionedDataDestinationResource;
 import static com.ionos.edc.schema.NextcloudSchema.*;
 
 @JsonDeserialize(builder = NextCloudProvisionedResource.Builder.class)

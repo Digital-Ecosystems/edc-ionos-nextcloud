@@ -2,7 +2,7 @@ package com.ionos.edc.token;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import org.eclipse.edc.connector.transfer.spi.types.SecretToken;
+import org.eclipse.edc.connector.controlplane.transfer.spi.types.SecretToken;
 
 @JsonTypeName("dataspaceconnector:nexcloudtoken")
 public class NextCloudToken implements SecretToken {

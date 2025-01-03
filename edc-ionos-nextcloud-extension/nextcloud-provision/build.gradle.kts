@@ -22,7 +22,10 @@ dependencies {
     implementation("${edcGroup}:transfer-spi:${edcVersion}")
     implementation("${edcGroup}:core-spi:${edcVersion}")
     implementation("${edcGroup}:http-spi:${edcVersion}")
+    implementation("${edcGroup}:http:${edcVersion}")
     implementation("${edcGroup}:web-spi:${edcVersion}")
+    implementation("${edcGroup}:control-plane-spi:${edcVersion}")
+
 
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("dev.failsafe:failsafe:3.2.4")

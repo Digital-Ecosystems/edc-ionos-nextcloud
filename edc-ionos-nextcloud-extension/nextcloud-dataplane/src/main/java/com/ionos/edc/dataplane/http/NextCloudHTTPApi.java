@@ -10,8 +10,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.eclipse.edc.web.spi.ApiErrorDetail;
 import org.springframework.http.ResponseEntity;
 
-import java.net.http.HttpResponse;
-
 public interface NextCloudHTTPApi {
 
     @Operation(description = "Start transfer between provider and consumer. ",
